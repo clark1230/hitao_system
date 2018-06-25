@@ -23,6 +23,8 @@ export default {
     ])
   },
   created() {
+    //console.log("角色:---"+this.roles)
+    //console.log(['admin'].includes('admin'));
     if (!this.roles.includes('admin')) {
       this.currentRole = 'editorDashboard'
     }

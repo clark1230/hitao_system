@@ -69,6 +69,7 @@ export default {
         selector: `#${this.tinymceId}`,
         height: this.height,
         body_class: 'panel-body ',
+         language: 'zh_CN',
         object_resizing: false,
         toolbar: this.toolbar.length > 0 ? this.toolbar : toolbar,
         menubar: this.menubar,
@@ -79,7 +80,7 @@ export default {
         code_dialog_width: 1000,
         advlist_bullet_styles: 'square',
         advlist_number_styles: 'default',
-        imagetools_cors_hosts: ['www.tinymce.com', 'codepen.io'],
+        imagetools_cors_hosts: ['www.tinymce.com', 'codepen.io'], //图片
         default_link_target: '_blank',
         link_title: false,
         init_instance_callback: editor => {

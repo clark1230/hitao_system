@@ -6,9 +6,9 @@ import permission from './modules/permission'
 import tagsView from './modules/tagsView'
 import user from './modules/user'
 import getters from './getters'
-
+import config from '../api/config'
 Vue.use(Vuex)
-
+Vue.prototype.myConfig = config
 const store = new Vuex.Store({
   modules: {
     app,

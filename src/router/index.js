@@ -3,7 +3,7 @@ import Router from 'vue-router'
 const _import = require('./_import_' + process.env.NODE_ENV)
 // in development-env not use lazy-loading, because lazy-loading too many pages will cause webpack hot update too slow. so only in production use lazy-loading;
 // detail: https://panjiachen.github.io/vue-element-admin-site/#/lazy-loading
-
+console.log(_import)
 Vue.use(Router)
 
 /* Layout */
@@ -42,17 +42,6 @@ export const constantRouterMap = [
       name: 'dashboard',
       meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
     }]
-  },
-  {
-    path: '/documentation',
-    component: Layout,
-    redirect: '/documentation/index',
-    children: [{
-      path: 'index',
-      component: _import('documentation/index'),
-      name: 'documentation',
-      meta: { title: 'documentation', icon: 'documentation', noCache: true }
-    }]
   }
 ]
 
@@ -63,33 +52,33 @@ export default new Router({
 })
 
 export const asyncRouterMap = [
-  {
-    path: '/permission',
-    component: Layout,
-    redirect: '/permission/index',
-    meta: { roles: ['admin'] }, // you can set roles in root nav
-    children: [{
-      path: 'index',
-      component: _import('permission/index'),
-      name: 'permission',
-      meta: {
-        title: 'permission',
-        icon: 'lock',
-        roles: ['admin'] // or you can only set roles in sub nav
-      }
-    }]
-  },
+  // {
+  //   path: '/permission',
+  //   component: Layout,
+  //   redirect: '/permission/index',
+  //   meta: { roles: ['admin'] }, // you can set roles in root nav
+  //   children: [{
+  //     path: 'index',
+  //     component: _import('permission/index'),
+  //     name: 'permission',
+  //     meta: {
+  //       title: 'permission',
+  //       icon: 'lock',
+  //       roles: ['admin'] // or you can only set roles in sub nav
+  //     }
+  //   }]
+  // },
 
-  {
-    path: '/icon',
-    component: Layout,
-    children: [{
-      path: 'index',
-      component: _import('svg-icons/index'),
-      name: 'icons',
-      meta: { title: 'icons', icon: 'icon', noCache: true }
-    }]
-  },
+  // {
+  //   path: '/icon',
+  //   component: Layout,
+  //   children: [{
+  //     path: 'index',
+  //     component: _import('svg-icons/index'),
+  //     name: 'icons',
+  //     meta: { title: 'icons', icon: 'icon', noCache: true }
+  //   }]
+  // },
 
   {
     path: '/components',
@@ -115,21 +104,21 @@ export const asyncRouterMap = [
     ]
   },
 
-  {
-    path: '/charts',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'charts',
-    meta: {
-      title: 'charts',
-      icon: 'chart'
-    },
-    children: [
-      { path: 'keyboard', component: _import('charts/keyboard'), name: 'keyboardChart', meta: { title: 'keyboardChart', noCache: true }},
-      { path: 'line', component: _import('charts/line'), name: 'lineChart', meta: { title: 'lineChart', noCache: true }},
-      { path: 'mixchart', component: _import('charts/mixChart'), name: 'mixChart', meta: { title: 'mixChart', noCache: true }}
-    ]
-  },
+  // {
+  //   path: '/charts',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   name: 'charts',
+  //   meta: {
+  //     title: 'charts',
+  //     icon: 'chart'
+  //   },
+  //   children: [
+  //     { path: 'keyboard', component: _import('charts/keyboard'), name: 'keyboardChart', meta: { title: 'keyboardChart', noCache: true }},
+  //     { path: 'line', component: _import('charts/line'), name: 'lineChart', meta: { title: 'lineChart', noCache: true }},
+  //     { path: 'mixchart', component: _import('charts/mixChart'), name: 'mixChart', meta: { title: 'mixChart', noCache: true }}
+  //   ]
+  // },
 
   {
     path: '/example',
@@ -162,88 +151,169 @@ export const asyncRouterMap = [
       { path: 'tab/index', icon: 'tab', component: _import('example/tab/index'), name: 'tab', meta: { title: 'tab' }}
     ]
   },
-
+  // {
+  //   path: '/theme',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   children: [{ path: 'index', component: _import('theme/index'), name: 'theme', meta: { title: 'theme', icon: 'theme' }}]
+  // },
+  { path: '*', redirect: '/404', hidden: true },
   {
-    path: '/form',
+    path: '/system',
+    redirect: '/system/user',
+    alwaysShow: true,
     component: Layout,
-    redirect: 'noredirect',
-    name: 'form',
+    name: 'system',
     meta: {
-      title: 'form',
+      title: 'system',
       icon: 'form'
     },
     children: [
-      { path: 'create-form', component: _import('form/create'), name: 'createForm', meta: { title: 'createForm', icon: 'table' }},
-      { path: 'edit-form', component: _import('form/edit'), name: 'editForm', meta: { title: 'editForm', icon: 'table' }}
+      { path: 'user', component: _import('permissions/user/user'), name: 'user', meta: { title: 'user', noCache: true }},
+      { path: 'permission', component: _import('permissions/permission/permission'), name: 'permission', meta: { title: 'permission', noredirect: true }},
+      { path: 'role', component: _import('permissions/role/role'), name: 'role', meta: { title: 'role', noCache: true }}
     ]
   },
-
   {
-    path: '/error',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'errorPages',
-    meta: {
-      title: 'errorPages',
-      icon: '404'
-    },
-    children: [
-      { path: '401', component: _import('errorPage/401'), name: 'page401', meta: { title: 'page401', noCache: true }},
-      { path: '404', component: _import('errorPage/404'), name: 'page404', meta: { title: 'page404', noCache: true }}
-    ]
-  },
-
-  {
-    path: '/error-log',
-    component: Layout,
-    redirect: 'noredirect',
-    children: [{ path: 'log', component: _import('errorLog/index'), name: 'errorLog', meta: { title: 'errorLog', icon: 'bug' }}]
-  },
-
-  {
-    path: '/excel',
-    component: Layout,
-    redirect: '/excel/export-excel',
-    name: 'excel',
-    meta: {
-      title: 'excel',
-      icon: 'excel'
-    },
-    children: [
-      { path: 'export-excel', component: _import('excel/exportExcel'), name: 'exportExcel', meta: { title: 'exportExcel' }},
-      { path: 'export-selected-excel', component: _import('excel/selectExcel'), name: 'selectExcel', meta: { title: 'selectExcel' }},
-      { path: 'upload-excel', component: _import('excel/uploadExcel'), name: 'uploadExcel', meta: { title: 'uploadExcel' }}
-    ]
-  },
-
-  {
-    path: '/zip',
-    component: Layout,
-    redirect: '/zip/download',
+    path: '/product',
+    redirect: '/product/goods',
     alwaysShow: true,
-    meta: { title: 'zip', icon: 'zip' },
-    children: [{ path: 'download', component: _import('zip/index'), name: 'exportZip', meta: { title: 'exportZip' }}]
-  },
-
-  {
-    path: '/theme',
     component: Layout,
+    name: 'goods',
+    meta: {
+      title: 'product',
+      icon: 'form'
+    },
+    children: [
+      { path: 'addGoods', component: _import('product/goods/addGoods'), name: 'addGoods', meta: { title: 'addGoods', noCache: true }},
+      { path: 'goods', component: _import('product/goods/goods'), name: 'goods', meta: { title: 'goods', noCache: true }},
+      { path: 'brand', component: _import('product/brand/brand'), name: 'brand', meta: { title: 'brand', noCache: true }},
+      { path: 'category', component: _import('product/category/category'), name: 'category', meta: { title: 'category', noCache: true }}
+    ]
+  },
+  {
+    path: '/monitor',
     redirect: 'noredirect',
-    children: [{ path: 'index', component: _import('theme/index'), name: 'theme', meta: { title: 'theme', icon: 'theme' }}]
-  },
-
-  {
-    path: '/clipboard',
+    alwaysShow: true,
     component: Layout,
+    name: 'monitor',
+    meta: {
+      title: 'monitor',
+      icon: 'form'
+    },
+    children: [
+      { path: 'springbootadmin', component: _import('monitor/springbootadmin'), name: 'springbootadmin', meta: { title: 'springbootadmin', noCache: true }},
+      { path: 'connectionpool', component: _import('monitor/connectionpool'), name: 'connectionpool', meta: { title: 'connectionpool', noCache: true }},
+      { path: 'eureka', component: _import('monitor/eureka'), name: 'eureka', meta: { title: 'eureka', noCache: true }},
+      { path: 'zipkin', component: _import('monitor/zipkin'), name: 'zipkin', meta: { title: 'zipkin', noCache: true }},
+      { path: 'rabbitmq', component: _import('monitor/rabbitmq'), name: 'rabbitmq', meta: { title: 'rabbitmq', noCache: true }},
+      { path: 'kibana', component: _import('monitor/ELK/kibana'), name: 'kibana', meta: { title: 'kibana', noCache: true }},
+      { path: 'head', component: _import('monitor/ELK/head'), name: 'head', meta: { title: 'head', noCache: true }},
+      { path: 'bigdesk', component: _import('monitor/ELK/bigdesk'), name: 'bigdesk', meta: { title: 'bigdesk', noCache: true }},
+      { path: 'bigdesk', component: _import('monitor/pinpoint'), name: 'pinpoint', meta: { title: 'pinpoint', noCache: true }}
+    ]
+  },
+  {
+    path: '/api',
     redirect: 'noredirect',
-    children: [{ path: 'index', component: _import('clipboard/index'), name: 'clipboardDemo', meta: { title: 'clipboardDemo', icon: 'clipboard' }}]
-  },
-
-  {
-    path: '/i18n',
+    alwaysShow: true,
     component: Layout,
-    children: [{ path: 'index', component: _import('i18n-demo/index'), name: 'i18n', meta: { title: 'i18n', icon: 'international' }}]
+    name: 'api',
+    meta: {
+      title: 'api',
+      icon: 'form'
+    },
+    children: [
+      { path: 'member-provider-api', component: _import('api/member-provider-api'), name: 'member-provider-api', meta: { title: 'member-provider-api', noCache: true }},
+      { path: 'product-provider-api', component: _import('api/product-provider-api'), name: 'product-provider-api', meta: { title: 'product-provider-api', noCache: true }},
+      { path: 'system-api', component: _import('api/system-api'), name: 'system-api', meta: { title: 'system-api', noCache: true }}
+    ]
   },
+  {
+    path: '/member',
+    redirect: 'noredirct',
+    alwaysShow: true,
+    component: Layout,
+    name: 'member',
+    meta: {
+      title: 'member',
+      icon: 'form'
+    },
+    children: [
+      { path: 'shopAddress', component: _import('member/shopAddress'), name: 'shopAddress', meta: { title: 'shopAddress', noCache: true }},
+      { path: 'shopArea', component: _import('member/shopArea'), name: 'shopArea', meta: { title: 'shopArea', noCache: true }}
+    ]
+  },
+  {
+    path: '/gateway',
+    redirct: 'nodirect',
+    alwaysShow: true,
+    component: Layout,
+    name: 'gateway',
+    meta: {
+      title: 'gateway',
+      icon: 'form'
+    },
+    children: [
+      { path: 'gateway', component: _import('gateway/gateway'), name: 'gateway', meta: { title: 'gateway', noCache: true }}
+    ]
+  },
+  {
+    path: '/order',
+    redirct: 'nodirect',
+    alwaysShow: true,
+    component: Layout,
+    name: 'order',
+    meta: {
+      title: 'order',
+      icon: 'form'
+    },
+    children: [
+      { path: 'order', component: _import('order/order'), name: 'order', meta: { title: 'order', noCache: true }}
+    ]
+  },
+  {
+    path: '/settings',
+    redirct: 'nodirect',
+    alwaysShow: true,
+    component: Layout,
+    name: 'settings',
+    meta: {
+      title: 'settings',
+      icon: 'form'
+    },
+    children: [
+      { path: 'settings', component: _import('settings/settings'), name: 'settings', meta: { title: 'settings', noCache: true }}
+    ]
+  },
+  {
+    path: '/article',
+    redirct: 'nodirect',
+    alwaysShow: true,
+    component: Layout,
+    name: 'article',
+    meta: {
+      title: 'article',
+      icon: 'form'
+    },
+    children: [
+      { path: 'article', component: _import('article/article'), name: 'article', meta: { title: 'article', noCache: true }}
+    ]
+  },
+  {
+    path: '/market',
+    redirct: 'nodirect',
+    alwaysShow: true,
+    component: Layout,
+    name: 'market',
+    meta: {
+      title: 'market',
+      icon: 'form'
+    },
+    children: [
+      { path: 'market', component: _import('market/coupon'), name: 'coupon', meta: { title: 'coupon', noCache: true }},
+      { path: 'adv', component: _import('market/adv'), name: 'adv', meta: { title: 'adv', noCache: true }}
+    ]
+  }
 
-  { path: '*', redirect: '/404', hidden: true }
 ]
