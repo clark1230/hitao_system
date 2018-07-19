@@ -7,8 +7,12 @@ import tagsView from './modules/tagsView'
 import user from './modules/user'
 import getters from './getters'
 import config from '../api/config'
+import api from '../config/api-config'
 Vue.use(Vuex)
+
 Vue.prototype.myConfig = config
+Vue.prototype.api = api
+
 const store = new Vuex.Store({
   modules: {
     app,

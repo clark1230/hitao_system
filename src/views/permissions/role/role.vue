@@ -3,6 +3,7 @@
     <div style="margin: 0px 0px 10px 0px;">
       <el-button @click="handleCreate" type="primary" icon='el-icon-circle-plus' plain>增加</el-button>
       <el-button type="danger" icon="el-icon-delete" plain>批量删除</el-button>
+      <el-button type="success" plain="">授予权限</el-button>
       <el-form  class="demo-form-inline" ref="form" style="display:inline-block;" label-width="10px">
         <el-form-item >
           <el-input  placeholder="请输入搜索值!"></el-input>
@@ -16,6 +17,7 @@
       stripe
       border
       size="mini"
+      :highlight-current-row='true'
       style="width: 100%">
       <el-table-column
         type="selection"
@@ -27,25 +29,25 @@
         width="180">
       </el-table-column>
       <el-table-column
-        prop="roleDescription"
-        label="角色描述"
-        width="180">
+        prop="createdBy"
+        label="录入人">
       </el-table-column>
       <el-table-column
         prop="createdTime"
         label="录入时间">
       </el-table-column>
       <el-table-column
-        prop="createdBy"
-        label="录入人">
+        prop="updatedBy"
+        label="修改人">
       </el-table-column>
       <el-table-column
         prop="updatedTime"
         label="修改时间">
       </el-table-column>
       <el-table-column
-        prop="updatedBy"
-        label="修改人">
+        prop="roleDescription"
+        label="角色描述"
+        width="180">
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
@@ -113,8 +115,8 @@
           roleDescription: ''
         },
         textMap: {
-          update: 'Edit',
-          create: 'Create'
+          update: '修改',
+          create: '新增'
         },
         rules: {
           roleName: [{ required: true, message: '请输入角色名称!', trigger: 'blur' }]
@@ -127,40 +129,59 @@
     methods: {
       handleGetData(page, limit) {
         var that = this
-        req.get(that.myConfig.host + 'shopRole/shopRoleAjax', {
+        req.get('authc/shopRole/shopRoleAjax', {
           params: {
             page: page,
             limit: limit
           }
         })
           .then(function(resp) {
-            that.tableData = resp.data.data
-            that.total = resp.data.count
+            if(resp.data.code === 0){
+              that.success('数据加载成功!');
+              that.tableData = resp.data.data
+              that.total = resp.data.count
+            }else{
+              that.error('数据加载失败!');
+            }
           }).catch(function(error) {
             console.log(error)
           })
       },
       handleDelete(index, row) {
-        console.log(row.roleId)
         var that = this
-        // 异步提交数据
-        req.get(that.myConfig.host + 'shopRole/deleteRole', {
-          params: {
-            roleId: row.roleId
-          }
-        })
-          .then(function(resp) {
-            if (resp.data.status === 0) {
-              that.success(resp.data.msg)
-            } else {
-              that.error(resp.data.msg)
+        this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+              // 异步提交数据
+          req.get(that.api.removeShopRole, {
+            params: {
+              roleId: row.roleId
             }
           })
+          .then(function(resp) {
+              if (resp.data.status === 0) {
+                that.success(resp.data.msg);
+                that.handleGetData(that.listQuery.page,that.listQuery.limit);
+              } else {
+                that.error(resp.data.msg)
+              }
+            }).catch((error) =>{
+              console.log(error);
+            });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
       },
       handleEdit(index, row) {
         var roleId = row.roleId
-        var that = this
-        req.get(that.myConfig.host + 'shopRole/findOne', {
+        var that = this;
+        this.dialogStatus = 'update';
+        req.get(that.myConfig.host + 'authc/shopRole/findOne', {
           params: {
             roleId: roleId
           }
@@ -193,7 +214,7 @@
 
       },
       handleRefresh: function() {
-        this.handleGetData(this.page,this.limit)
+        this.handleGetData(this.listQuery.page,this.listQuery.limit)
       },
       handleCreate: function() {
         this.resetTemp()
@@ -208,7 +229,7 @@
         this.$refs['dataForm'].validate((valid) => {
           console.log(valid)
           if (valid) {
-            req.post(that.myConfig.host + 'shopRole/addShopRole', this.temp)
+            req.post('authc/shopRole/addShopRole', this.temp)
               .then(function(resp) {
                 if (resp.data.status === 0) {
                   that.success(resp.data.msg)
@@ -227,15 +248,15 @@
         var that = this
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            req.post(that.myConfig.host + 'shopRole/updateShopRole', that.temp)
-              .then(function(resp) {
-                if (resp.data.status === 0) {
-                  that.success(resp.data.msg)
-                  that.dialogFormVisible = false
-                } else {
-                  that.error(resp.data.msg)
-                }
-              })
+            req.post('authc/shopRole/updateShopRole', that.temp)
+            .then(function(resp) {
+              if (resp.data.status === 0) {
+                that.success(resp.data.msg)
+                that.dialogFormVisible = false
+              } else {
+                that.error(resp.data.msg)
+              }
+            })
           }
         })
       },

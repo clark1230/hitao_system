@@ -1,16 +1,18 @@
 import { loginByUsername, logout, getUserInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
+import { setPersmissions, getPermissions } from '../../utils/auth'
 
 const user = {
   state: {
     user: '',
     status: '',
     code: '',
-    token: getToken(),
+    token: getToken(), // 令牌
     name: '',
     avatar: '',
     introduction: '',
     roles: [],
+    permissions: getPermissions(), // 权限
     setting: {
       articlePlatform: []
     }
@@ -40,6 +42,9 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_PERMISSIONS: (state, permissons) => {
+      state.permissions = permissons
     }
   },
 
@@ -67,7 +72,8 @@ const user = {
             reject('error')
           }
           const data = response.data
-          console.log(data.data.shopAdmin.adminName)
+          setPersmissions(data.data.permissions)
+          console.log('权限:' + data.data.permissions)
           commit('SET_ROLES', data.data.roles)
           commit('SET_NAME', data.data.shopAdmin.adminName)
           commit('SET_AVATAR', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=925993276,4023638545&fm=27&gp=0.jpg')

@@ -68,8 +68,8 @@ export default {
       window.tinymce.init({
         selector: `#${this.tinymceId}`,
         height: this.height,
-        body_class: 'panel-body ',
-         language: 'zh_CN',
+        body_class: 'panel-body',
+        language: 'zh_CN',
         object_resizing: false,
         toolbar: this.toolbar.length > 0 ? this.toolbar : toolbar,
         menubar: this.menubar,

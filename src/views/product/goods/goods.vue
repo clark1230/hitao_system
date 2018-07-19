@@ -123,7 +123,7 @@
     methods: {
       handleGetData(page, limit, searchParam, searchValue) {
         var that = this
-        req.get(that.myConfig.host + 'shopGoods/shopGoodsAjax', {
+        req.get(that.api.shopGoodsAPI, {
           params: {
             page: page,
             limit: limit,

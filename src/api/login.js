@@ -6,7 +6,7 @@ export function loginByUsername(adminName, adminPassword) {
     adminPassword
   }
   return request({
-    url: '/account/login',
+    url: '/authc/account/login',
     method: 'post',
     data
   })
@@ -14,15 +14,14 @@ export function loginByUsername(adminName, adminPassword) {
 
 export function logout() {
   return request({
-    url: '/account/logout',
-    method: 'post'
+    url: '/authc/account/logout',
+    method: 'get'
   })
 }
 
 export function getUserInfo(token) {
   return request({
-    url: '/shopAdmin/info',
-    method: 'get',
-    params: { token }
+    url: '/authc/shopAdmin/info',
+    method: 'get'
   })
 }

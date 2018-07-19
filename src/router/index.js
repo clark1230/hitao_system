@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import { getPermissions } from '../utils/auth'
 const _import = require('./_import_' + process.env.NODE_ENV)
 // in development-env not use lazy-loading, because lazy-loading too many pages will cause webpack hot update too slow. so only in production use lazy-loading;
 // detail: https://panjiachen.github.io/vue-element-admin-site/#/lazy-loading
-console.log(_import)
 Vue.use(Router)
 
 /* Layout */
@@ -27,6 +27,8 @@ import Layout from '../views/layout/Layout'
     noCache: true                if true ,the page will no be cached(default is false)
   }
 **/
+
+// 静态路由
 export const constantRouterMap = [
   { path: '/login', component: _import('login/index'), hidden: true },
   { path: '/authredirect', component: _import('login/authredirect'), hidden: true },
@@ -46,11 +48,41 @@ export const constantRouterMap = [
 ]
 
 export default new Router({
-  // mode: 'history', // require service support
+  // mode: 'history', // 需要服务支持
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
 
+// 计算表达式的值
+function evil(fn) { // 替代eval函数，ESLint语法检查规则问题!
+  var Fn = Function // 一个变量指向Function，防止有些前端编译工具报错
+  return new Fn('return ' + fn)()
+}
+var permissions = getPermissions()
+permissions = (permissions !== undefined ? eval( '(' + permissions + ')') : [])
+var routerArr = []
+
+// 遍历后台权限信息,组装成动态路由信息
+permissions.forEach(per => {
+  per.children.forEach((ele) => {
+    var meta = JSON.parse(per.meta)
+    ele.component = _import(per.component) // 加载页面组件
+    ele.meta = {
+      title: meta.title, // 菜单标题
+      noCache: meta.noCache // 是否缓存页面
+    }
+  })
+  var router = {
+    path: per.path,
+    alwaysShow: true,
+    component: Layout,
+    name: per.name,
+    meta: JSON.parse(per.meta),
+    children: per.children
+  }
+  routerArr.push(router)
+})
+// 动态路由
 export const asyncRouterMap = [
   // {
   //   path: '/permission',
@@ -103,23 +135,6 @@ export const asyncRouterMap = [
       { path: 'back-to-top', component: _import('components-demo/backToTop'), name: 'backToTop-demo', meta: { title: 'backToTop' }}
     ]
   },
-
-  // {
-  //   path: '/charts',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   name: 'charts',
-  //   meta: {
-  //     title: 'charts',
-  //     icon: 'chart'
-  //   },
-  //   children: [
-  //     { path: 'keyboard', component: _import('charts/keyboard'), name: 'keyboardChart', meta: { title: 'keyboardChart', noCache: true }},
-  //     { path: 'line', component: _import('charts/line'), name: 'lineChart', meta: { title: 'lineChart', noCache: true }},
-  //     { path: 'mixchart', component: _import('charts/mixChart'), name: 'mixChart', meta: { title: 'mixChart', noCache: true }}
-  //   ]
-  // },
-
   {
     path: '/example',
     component: Layout,
@@ -166,12 +181,13 @@ export const asyncRouterMap = [
     name: 'system',
     meta: {
       title: 'system',
-      icon: 'form'
+      icon: 'form',
+      roles: ['admin']
     },
     children: [
-      { path: 'user', component: _import('permissions/user/user'), name: 'user', meta: { title: 'user', noCache: true }},
+      { path: 'user', 'component': _import('permissions/user/user'), name: 'user', meta: { title: 'user', noCache: true }},
       { path: 'permission', component: _import('permissions/permission/permission'), name: 'permission', meta: { title: 'permission', noredirect: true }},
-      { path: 'role', component: _import('permissions/role/role'), name: 'role', meta: { title: 'role', noCache: true }}
+      { path: 'role', component: _import('permissions/role/role'), name: 'role', meta: { title: 'role', noCache: true, roles: ['admin'] }}
     ]
   },
   {
@@ -182,7 +198,8 @@ export const asyncRouterMap = [
     name: 'goods',
     meta: {
       title: 'product',
-      icon: 'form'
+      icon: 'form',
+      roles: ['editor']
     },
     children: [
       { path: 'addGoods', component: _import('product/goods/addGoods'), name: 'addGoods', meta: { title: 'addGoods', noCache: true }},
@@ -259,20 +276,6 @@ export const asyncRouterMap = [
     ]
   },
   {
-    path: '/order',
-    redirct: 'nodirect',
-    alwaysShow: true,
-    component: Layout,
-    name: 'order',
-    meta: {
-      title: 'order',
-      icon: 'form'
-    },
-    children: [
-      { path: 'order', component: _import('order/order'), name: 'order', meta: { title: 'order', noCache: true }}
-    ]
-  },
-  {
     path: '/settings',
     redirct: 'nodirect',
     alwaysShow: true,
@@ -314,6 +317,6 @@ export const asyncRouterMap = [
       { path: 'market', component: _import('market/coupon'), name: 'coupon', meta: { title: 'coupon', noCache: true }},
       { path: 'adv', component: _import('market/adv'), name: 'adv', meta: { title: 'adv', noCache: true }}
     ]
-  }
-
+  },
+  routerArr[0]
 ]

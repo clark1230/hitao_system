@@ -208,7 +208,7 @@ export default {
   },
   created() {
     var that = this
-    req.get(that.myConfig.host + 'shopGoodsCategory/ajaxCate').then(function(resp) {
+    req.get(this.api.shopGoodsCategoryAPI).then(function(resp) {
       if(resp.data.status === 0){
         that.options =  resp.data.data
       }

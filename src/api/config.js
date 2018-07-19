@@ -1,4 +1,4 @@
-const host = 'http://localhost:8140/'
+const host = 'http://localhost:8200/'
 
 export default {
   host

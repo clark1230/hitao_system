@@ -8,13 +8,14 @@
           <el-input  placeholder="请输入搜索值!"></el-input>
         </el-form-item>
       </el-form>
-      <el-button  style="display:inline-block;" type="primary"  icon="el-icon-search">搜索</el-button>
+      <el-button  style="display:inline-block;" :loading="isSearchRefresh" type="primary"  icon="el-icon-search">搜索</el-button>
       <el-button @click="handleRefresh" icon="el-icon-refresh">刷新</el-button>
-      <el-button type="primary" @click="handleGatewayRefresh" icon="el-icon-refresh">刷新路由</el-button>
+      <el-button type="primary" @click="handleGatewayRefresh" :loading="isRefreshRoute" icon="el-icon-refresh">刷新路由</el-button>
     </div>
     <el-table
       :data="tableData"
       ref="gatwayTable"
+      v-loading="loading"
       stripe
       border
       size="mini"
@@ -125,12 +126,15 @@
 </template>
 <script>
   import req from '@/utils/request'
-  var api = require('../../config/api-config.js')
-  console.log('地址:'+api.gatewayAPI);
   export default {
     data() {
       return {
         tableData: [],
+        loading: true,
+        btnRefresh: {
+          isRefreshRoute: false, // 是否刷新路由信息
+          isSearchRefresh: false // 是否搜索信息
+        },
         total: 0,
         listQuery: {
           page: 1,
@@ -171,13 +175,14 @@
     methods: {
       handleGetData(page, limit) {
         var that = this
-        req.get(api.gatewayAPI, {
+        req.get(that.api.gatewayAPI, {
           params: {
             page: page,
             limit: limit
           }
         })
           .then(function(resp) {
+            that.loading =false
             if(resp.data.status === 0){
               that.success('数据加载成功!')
               that.tableData = resp.data.data.data;
@@ -186,7 +191,8 @@
               that.error('数据加载失败!');
             }
           }).catch(function(error) {
-            console.log(error)
+            that.loading =false
+            console.log(error.reponse.status)
           })
       },
       handleSizeChange(val) {
@@ -204,7 +210,7 @@
       handleUpdate(index,row){ //编辑网关
         var that = this;
         //this.$refs['dataForm'].resetFields();
-        req.get(api.gatewayFindOne+'?id='+row.id, {
+        req.get(that.api.gatewayFindOne+'?id='+row.id, {
           params: {
           }
         })
@@ -222,16 +228,16 @@
       },
       handleEnabled(index,row){ // 启用/关闭网关
         var that = this;
-        req.post(api.editGateway, {
+        req.post(that.api.editGateway, {
             id: row.id,
             enabled: row.enabled === true?false:true
         })
           .then(function(resp) {
            if(resp.data.status === 0){
-              that.success('操作成功!');
+              that.successNotify('操作成功!');
               that.handleGetData(that.listQuery.page, that.listQuery.limit)
             }else{
-              that.error('操作失败!');
+              that.errorNotify('操作失败!');
             }
           }).catch(function(error) {
             console.log(error)
@@ -247,14 +253,14 @@
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            req.get(api.deleteGateway+"?ids="+ids, {})
+            req.get(that.api.deleteGateway+"?ids="+ids, {})
             .then(function(resp) {
               if(resp.data.status === 0){
-                  that.success('操作成功!');
+                  that.successNotify('操作成功!');
                   that.handleGetData(that.listQuery.page, that.listQuery.limit);
                   that.ids = [];
                 }else{
-                  that.error('操作失败!');
+                  that.errorNotify('操作失败!');
                 }
               }).catch(function(error) {
                 console.log(error);
@@ -280,18 +286,23 @@
         });
       },
       handleRefresh() {
+        this.loading = true
         this.handleGetData(1, 15)
       },
       handleGatewayRefresh() {
         // http://localhost:8200/refreshRoute
         let that = this
-        req.get('http://localhost:8200/refreshRoute').then((resp)=>{
-          console.log(resp);
+        that.btnRefresh.isRefreshRoute = true
+        req.get(that.api.refreshRoute).then((resp)=>{
+          that.btnRefresh.isRefreshRoute = false
           if(resp.data.status === 0){
-            that.success(resp.data.msg)
+            that.successNotify(resp.data.msg)
           }else{
-            that.error(resp.data.msg)
+            that.errorNotify(resp.data.msg)
           }
+        })
+        .catch((error) =>{
+          that.btnRefresh.isRefreshRoute = false
         })
       },
       handleSubmitData(){  //提交表单
@@ -300,18 +311,18 @@
           console.log(valid)
           if (valid) {
             that.success('表单校验成功!');
-            var url = (that.dialogStatus === 'create'?'gatewayApiDefine/addGatewayApiDefine':'gatewayApiDefine/editGatewayApiDefine');
+            var url = (that.dialogStatus === 'create'? that.api.addGateway : that.api.editGateway);
             req.post(url, this.temp)
               .then(function(resp) {
                 console.log(resp);
                 if (resp.data.status === 0) {
-                  that.success(resp.data.msg)
+                  that.successNotify(resp.data.msg)
                   that.$refs['dataForm'].resetFields();
                   that.resetTemp(); // 重置数据
                   that.dialogFormVisible = false
                   that.handleGetData(that.listQuery.page,that.listQuery.limit);
                 } else {
-                  that.error(resp.data.msg)
+                  that.errorNotify(resp.data.msg)
                 }
               })
               .catch(function(error) {
@@ -330,14 +341,14 @@
       },
       resetTemp: function(){
         this.temp = {
-          id: 0,
-          path: '',
-          serviceId: '',
-          url: '',
-          retryable: false,
-          enabled: false,
-          stripPrefix: true,
-          apiName: null
+          id: 0,  // 编号
+          path: '', // 路由规则
+          serviceId: '', // 服务编号
+          url: '', // 代理微服务地址
+          retryable: false, // 是否可重试
+          enabled: true, // 是否启用
+          stripPrefix: true, // 是否严格匹配前缀
+          apiName: null // 网关名称
         };
       },
       success(msg) {
@@ -352,8 +363,21 @@
           message: msg,
           type: 'error',
           duration: 1500
-      })
-    }
+        })
+      },
+      successNotify(msg) {
+         this.$notify({
+          title: '成功',
+          message: msg,
+          type: 'success'
+        });
+      },
+      errorNotify(msg) {
+        this.$notify.error({
+          title: '错误',
+          message: msg
+        });
+      }
     }
   }
 </script>

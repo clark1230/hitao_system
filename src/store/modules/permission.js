@@ -21,7 +21,7 @@ function hasPermission(roles, route) {
 function filterAsyncRouter(asyncRouterMap, roles) {
   const accessedRouters = asyncRouterMap.filter(route => {
     if (hasPermission(roles, route)) {
-      if (route.children && route.children.length) {
+      if ((route.children) && route.children.length > 0) {
         route.children = filterAsyncRouter(route.children, roles)
       }
       return true
@@ -52,6 +52,7 @@ const permission = {
         } else {
           accessedRouters = filterAsyncRouter(asyncRouterMap, roles)
         }
+        console.log('设置路由表:' + accessedRouters)
         commit('SET_ROUTERS', accessedRouters)
         resolve()
       })

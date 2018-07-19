@@ -1,5 +1,8 @@
 import axios from 'axios'
+import router from '../router'
 import { Message } from 'element-ui'
+import { Loading } from 'element-ui'
+import { Notification } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
 
@@ -13,7 +16,7 @@ const service = axios.create({
 service.interceptors.request.use(config => {
   // Do something before request is sent
   if (store.getters.token) {
-    config.headers['token'] = getToken() // 让每个请求携带token-- ['X-Token']为自定义key 请根据实际情况自行修改
+    config.headers['token'] = getToken() // 让每个请求携带token-- ['token']为自定义key
   }
   return config
 }, error => {
@@ -24,12 +27,37 @@ service.interceptors.request.use(config => {
 
 // respone interceptor
 service.interceptors.response.use(
-  response => response,
+  // response => response,
   /**
   * 下面的注释为通过response自定义code来标示请求状态，当code返回如下情况为权限有问题，登出并返回到登录页
   * 如通过xmlhttprequest 状态码标识 逻辑可写在下面error中
   */
-  //  const res = response.data;
+  response => {
+    const res = response.data
+    if (res.status === 4001 || res.status === 4000) {
+      Notification({
+        title: '错误',
+        type: 'error',
+        message: '登陆已经失效!请重新登录!'
+      })
+      const loading = Loading.service({
+        lock: true,
+        text: '登陆失效,正在跳转到登陆页...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)',
+        customClass: 'login-loading'
+      })
+      setTimeout(function() {
+        loading.close() // 关闭加载
+        router.push('/login') // 跳转到登录页
+      }, 2000)
+      return Promise.reject('error')
+    } else {
+      return response
+    }
+  },
+  // response => {
+  // const res = response.data;
   //     if (res.code !== 20000) {
   //       Message({
   //         message: res.message,
@@ -54,6 +82,13 @@ service.interceptors.response.use(
   //     }
   error => {
     console.log('err' + error)// for debug
+    if (error.response.status === 429) {
+      Notification({
+        title: '错误',
+        type: 'error',
+        message: '请求次数过于频繁,请稍后再尝试!'
+      })
+    }
     Message({
       message: error.message,
       type: 'error',

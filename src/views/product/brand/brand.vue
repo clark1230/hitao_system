@@ -89,7 +89,7 @@ export default {
   methods: {
     handleGetData(page, limit) {
         var that = this
-        req.get(that.myConfig.host + 'shopBrand/shopBrandAjax', {
+        req.get(that.api.shopBrandAPI, {
           params: {
             page: page,
             limit: limit
