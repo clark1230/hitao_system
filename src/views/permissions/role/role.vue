@@ -127,9 +127,9 @@
       this.handleGetData(this.listQuery.page, this.listQuery.limit)
     },
     methods: {
-      handleGetData(page, limit) {
+      handleGetData(page, limit) { // 加载数据
         var that = this
-        req.get('authc/shopRole/shopRoleAjax', {
+        req.get(this.api.shopRoleAPI, {
           params: {
             page: page,
             limit: limit
@@ -137,17 +137,17 @@
         })
           .then(function(resp) {
             if(resp.data.code === 0){
-              that.success('数据加载成功!');
+              that.baseMsg('数据加载成功!','success');
               that.tableData = resp.data.data
               that.total = resp.data.count
             }else{
-              that.error('数据加载失败!');
+              that.baseMsg('数据加载失败!','error');
             }
           }).catch(function(error) {
             console.log(error)
           })
       },
-      handleDelete(index, row) {
+      handleDelete(index, row) { // 删除数据
         var that = this
         this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
           confirmButtonText: '确定',
@@ -162,26 +162,23 @@
           })
           .then(function(resp) {
               if (resp.data.status === 0) {
-                that.success(resp.data.msg);
+                that.baseMsg(resp.data.msg,'success');
                 that.handleGetData(that.listQuery.page,that.listQuery.limit);
               } else {
-                that.error(resp.data.msg)
+                that.baseMsg(resp.data.msg,'error')
               }
             }).catch((error) =>{
               console.log(error);
             });
         }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
+          this.baseMsg('已经取消删除!','error')
         });
       },
       handleEdit(index, row) {
         var roleId = row.roleId
         var that = this;
         this.dialogStatus = 'update';
-        req.get(that.myConfig.host + 'authc/shopRole/findOne', {
+        req.get(this.api.shopRoleFindOne, {
           params: {
             roleId: roleId
           }
@@ -195,7 +192,7 @@
                 this.$refs['dataForm'].clearValidate()
               })
             } else {
-              that.error('数据获取失败!')
+              that.baseMsg('数据获取失败!','error')
             }
           })
           .catch(function(error) {
@@ -224,18 +221,18 @@
           this.$refs['dataForm'].clearValidate()
         })
       },
-      createData: function() {
+      createData: function() { // 添加角色信息
         var that = this
         this.$refs['dataForm'].validate((valid) => {
           console.log(valid)
           if (valid) {
-            req.post('authc/shopRole/addShopRole', this.temp)
+            req.post(this.api.addShopRole, this.temp)
               .then(function(resp) {
                 if (resp.data.status === 0) {
-                  that.success(resp.data.msg)
+                  that.baseMsg(resp.data.msg,'success')
                   that.dialogFormVisible = false
                 } else {
-                  that.error(resp.data.msg)
+                  that.baseMsg(resp.data.msg,'error')
                 }
               })
               .catch(function(error) {
@@ -244,41 +241,27 @@
           }
         })
       },
-      updateData: function() {
+      updateData: function() { // 编辑角色信息
         var that = this
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            req.post('authc/shopRole/updateShopRole', that.temp)
+            req.post(this.api.updateShopRole, that.temp)
             .then(function(resp) {
               if (resp.data.status === 0) {
-                that.success(resp.data.msg)
+                that.baseMsg(resp.data.msg,'success')
                 that.dialogFormVisible = false
               } else {
-                that.error(resp.data.msg)
+                that.baseMsg(resp.data.msg,'error')
               }
             })
           }
         })
       },
-      resetTemp: function() {
+      resetTemp: function() { // 重置表单
         this.temp = {
           roleName: '',
           roleDescription: ''
         }
-      },
-      success(msg) {
-        this.$message({
-          message: msg,
-          type: 'success',
-          duration: 1500
-        })
-      },
-      error(msg) {
-        this.$message({
-          message: msg,
-          type: 'error',
-          duration: 1500
-        })
       }
     }
   }

@@ -100,7 +100,7 @@
     methods: {
       handleGetData(page, limit, searchParam, searchValue) {
         var that = this
-        req.get(that.myConfig.host + 'shopArea/shopAreaAjax', {
+        req.get(that.api.shopAreaAPI, {
           params: {
             page: page,
             limit: limit,
@@ -131,17 +131,16 @@
       handleSearch() { // 处理搜索
         let searchParam = this.searchParam
         let searchValue = this.searchValue
-        console.log(searchValue)
         if (searchParam === ''){
-           this.error('请选择搜索条件!')
+           this.baseMsg('请选择搜索条件!','error')
            return false
         } else {
           let reg = /^\d{1,}$/
           if ( searchValue === ''){
-             this.error('请输入搜索值!')
+             this.baseMsg('请输入搜索值!','error')
              return false
           }else if( searchParam === 'postCode' && !reg.test(searchValue)){
-            this.error('邮编为数字!')
+            this.baseMsg('邮编为数字!','error')
             this.searchValue = ''
             return false
           }
@@ -151,20 +150,6 @@
       },
       handleCreate(){
         console.log('添加....')
-      },
-      success(msg) {
-        this.$message({
-          message: msg,
-          type: 'success',
-          duration: 1500
-        })
-      },
-      error(msg) {
-        this.$message({
-          message: msg,
-          type: 'error',
-          duration: 1500
-        })
       }
     }
   }

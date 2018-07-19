@@ -18,8 +18,13 @@ window.g = {
     // 系统角色接口
     removeShopRole: host + 'authc/shopRole/remove', // 删除系统角色接口
     removeBatchShopRole: host + 'authc/shop/removeBatch', // 批量删除系统角色接口
+    shopRoleAPI: host + 'authc/shopRole/shopRoleAjax',
+    shopRoleFindOne: host + 'authc/shopRole/findOne',
+    addShopRole: host + 'authc/shopRole/addShopRole',
+    updateShopRole: host + 'authc/shopRole/updateShopRole',
 
     // 系统用户接口
+    shopAdminAPI: host + 'authc/shopAdmin/shopAdminData',
     addShopAdmin: host + 'authc/shopAdmin/addShopAdmin', // 添加系统用户接口
     shopAdminFindOne: host + 'authc/shopAdmin/findOne', // 查找系统用户接口
     editShopAdmin: host + 'authc/shopAdmin/editShopAdmin', // 编辑系统用户接口
@@ -27,6 +32,7 @@ window.g = {
     shopAdminCheckExists: host + 'authc/shopAdmin/checkExists', // 检查用户是否存在接口
 
     // 菜单接口
+    shopMenuTreeData: host + 'authc/shopMenu/menuTreeData',
     shopMenuAPI: host + 'authc/shopMenu/shopMenuData',
     saveShopMenu: host + 'authc/shopMenu/save', // 保存系统菜单接口
     findShopMenu: host + 'authc/shopMenu/findOne',
@@ -59,6 +65,12 @@ window.g = {
     shopGoodsAttrTemplateAPI: host + 'system/shopGoodsAttrTemplate/findAttr', // 根据类目编号查询模板信息
 
     // 文件上传接口
-    uploadBrandPic: host + 'fileupload/shopBrand/uploadPic' // 上传商品品牌图片
+    uploadBrandPic: host + 'fileupload/shopBrand/uploadPic', // 上传商品品牌图片
+
+    // 收货地址接口
+    shopAddressAPI: host + 'system/shopAddress/shopAddressAjax',
+
+    // 区域信息接口
+    shopAreaAPI: host + 'system/shopArea/shopAreaAjax'
   }
 }

@@ -154,7 +154,7 @@ export default {
   methods: {
     handleGetData(page, limit) {
       var that = this
-      req.get(that.myConfig.host + 'authc/shopAdmin/shopAdminData', {
+      req.get(that.api.shopAdminAPI, {
         params: {
           page: page,
           limit: limit

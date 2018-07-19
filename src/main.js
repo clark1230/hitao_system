@@ -17,8 +17,15 @@ import './icons' // icon
 import './errorLog'// error log
 import './permission' // permission control
 // import './mock' // simulation data
+import { showMsg } from './utils/common'
+import { showNotification } from './utils/common'
 
 import * as filters from './filters' // global filters
+
+Vue.prototype.api = window.g.api
+
+Vue.prototype.baseMsg = showMsg
+Vue.prototype.baseNotify = showNotification
 
 Vue.use(Element, {
   size: 'medium', // set element-ui default size

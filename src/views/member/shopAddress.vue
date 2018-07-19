@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
     <div style="margin: 0px 0px 10px 0px;">
-      <el-button type="warning" icon="el-icon-delete" plain>批量禁用</el-button>
       <el-select v-model="searchParam" placeholder="请选择搜索条件" style="display:inline-block;width:120px;">
           <el-option
             v-for="item in options"
@@ -38,10 +37,6 @@
             size="mini"
             type="primary"
             @click="handleEdit(scope.$index, scope.row)" title="编辑" icon="el-icon-edit" plain></el-button>
-          <el-button
-            size="mini"
-            type="warning"
-            @click="handleDelete(scope.$index, scope.row)" title="禁用" icon="el-icon-delete" plain></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -88,7 +83,7 @@
     methods: {
       handleGetData(page, limit,searchParam,searchValue) {
         var that = this
-        req.get(that.myConfig.host + 'shopAddress/shopAddressAjax', {
+        req.get(that.api.shopAddressAPI, {
           params: {
             page: page,
             limit: limit,
@@ -114,17 +109,16 @@
       handleSearch() { // 处理搜索
         let searchParam = this.searchParam
         let searchValue = this.searchValue
-        console.log(searchValue)
         if (searchParam === ''){
-           this.error('请选择搜索条件!')
+           this.baseMsg('请选择搜索条件!','error')
            return false
         } else {
           let reg = /^\d{1,}$/
           if ( searchValue === ''){
-             this.error('请输入搜索值!')
+             this.baseMsg('请输入搜索值!','error')
              return false
           }else if( searchParam === 'memberId' && !reg.test(searchValue)){
-            this.error('会员编号为数字!')
+            this.baseMsg('会员编号为数字!','error')
             this.searchValue = ''
             return false
           }
@@ -136,20 +130,6 @@
         this.searchParam = ''
         this.searchValue = ''
         this.handleGetData(1,20)
-      },
-      success(msg) {
-        this.$message({
-          message: msg,
-          type: 'success',
-          duration: 1500
-        })
-      },
-      error(msg) {
-        this.$message({
-          message: msg,
-          type: 'error',
-          duration: 1500
-        })
       }
     }
   }

@@ -184,11 +184,11 @@
           .then(function(resp) {
             that.loading =false
             if(resp.data.status === 0){
-              that.success('数据加载成功!')
+              that.baseMsg('数据加载成功!','success')
               that.tableData = resp.data.data.data;
               that.total = resp.data.data.count;
             }else{
-              that.error('数据加载失败!');
+              that.baseMsg('数据加载失败!','error');
             }
           }).catch(function(error) {
             that.loading =false
@@ -234,10 +234,10 @@
         })
           .then(function(resp) {
            if(resp.data.status === 0){
-              that.successNotify('操作成功!');
+              that.successNotify('成功','操作成功!','success');
               that.handleGetData(that.listQuery.page, that.listQuery.limit)
             }else{
-              that.errorNotify('操作失败!');
+              that.baseNotify('失败','操作失败!','error');
             }
           }).catch(function(error) {
             console.log(error)
@@ -256,27 +256,24 @@
             req.get(that.api.deleteGateway+"?ids="+ids, {})
             .then(function(resp) {
               if(resp.data.status === 0){
-                  that.successNotify('操作成功!');
+                  that.baseNotify('成功','操作成功!','success');
                   that.handleGetData(that.listQuery.page, that.listQuery.limit);
                   that.ids = [];
                 }else{
-                  that.errorNotify('操作失败!');
+                  that.baseNotify('失败','操作失败!','error');
                 }
               }).catch(function(error) {
                 console.log(error);
               })
           }).catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消删除'
-            });          
+            this.baseMsg('已取消删除','info')
           });
       },
       handleDeletByIds(){ // 批量删除网关
         if(this.ids.length > 0){
           this.commonDelete(this.ids);
         }else{
-          this.error('请选择要删除的数据!');
+          this.baseMsg('请选择要删除的数据!','error');
         }
       },
       handleSelectChange(rows){ // 勾选要删除的数据
@@ -296,9 +293,9 @@
         req.get(that.api.refreshRoute).then((resp)=>{
           that.btnRefresh.isRefreshRoute = false
           if(resp.data.status === 0){
-            that.successNotify(resp.data.msg)
+            that.baseNotify('成功',resp.data.msg,'success')
           }else{
-            that.errorNotify(resp.data.msg)
+            that.baseNotify('失败',resp.data.msg,'error')
           }
         })
         .catch((error) =>{
@@ -310,26 +307,25 @@
         this.$refs['dataForm'].validate((valid) => {
           console.log(valid)
           if (valid) {
-            that.success('表单校验成功!');
+            that.baseMsg('表单校验成功!','success');
             var url = (that.dialogStatus === 'create'? that.api.addGateway : that.api.editGateway);
             req.post(url, this.temp)
               .then(function(resp) {
-                console.log(resp);
                 if (resp.data.status === 0) {
-                  that.successNotify(resp.data.msg)
+                  that.baseNotify('成功',resp.data.msg,'success')
                   that.$refs['dataForm'].resetFields();
                   that.resetTemp(); // 重置数据
                   that.dialogFormVisible = false
                   that.handleGetData(that.listQuery.page,that.listQuery.limit);
                 } else {
-                  that.errorNotify(resp.data.msg)
+                  that.baseNotify('失败',resp.data.msg,'error')
                 }
               })
               .catch(function(error) {
                 console.log(error)
               })
           }else{
-            that.error('表单校验失败!');
+            that.baseMsg('表单校验失败!','error');
           }
         })
       },
@@ -350,20 +346,6 @@
           stripPrefix: true, // 是否严格匹配前缀
           apiName: null // 网关名称
         };
-      },
-      success(msg) {
-        this.$message({
-          message: msg,
-          type: 'success',
-          duration: 1500
-        })
-      },
-      error(msg) {
-        this.$message({
-          message: msg,
-          type: 'error',
-          duration: 1500
-        })
       },
       successNotify(msg) {
          this.$notify({

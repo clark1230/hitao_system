@@ -219,11 +219,11 @@ export default {
   },
   created: function() {
     var that = this
-    req.get(that.myConfig.host + 'authc/shopMenu/menuData').then(function(resp) {
+    req.get(that.api.shopMenuTreeData).then(function(resp) {
       if (resp.data.status === 0) {
         that.treeData = resp.data.data;
       } else {
-        that.errorNotify('数据加载失败!')
+        that.baseNotify('失败','数据加载失败!','error')
       }
     });
     this.handleGetData(this.listQuery.page,this.listQuery.limit);
@@ -241,7 +241,7 @@ export default {
             that.tableData = resp.data.data.data;
             that.total = resp.data.data.count;
           }else{
-            that.error('数据加载失败!');
+            that.baseMsg('数据加载失败!','error');
           }
         })
       },
@@ -256,19 +256,19 @@ export default {
           if (valid) {
             req.post(that.api.saveShopMenu,that.temp).then((resp) => {
               if(resp.data.status === 0){
-                that.successNotify('操作成功!');
+                that.baseNotify('成功','操作成功!','success');
                 this.$refs.tree.setCheckedNodes([]);
                 that.dialogFormVisible=false; // 关闭弹框
                 that.$refs['dataForm'].resetFields(); // 重置表单
                 that.resetTemp();// 重置表单数据
               }else{
-                 that.errorNotify('操作失败!');
+                 that.baseNotify('失败','操作失败!','error');
               }
             }).catch((error) => {
                 console.log(error);
             });
           } else {
-            that.error('表单验证失败!')
+            that.baseMsg('表单验证失败!','error')
           }
         })
       },
@@ -284,7 +284,7 @@ export default {
         if (resp.data.status === 0) {
           that.temp = resp.data.data
         } else {
-          that.error(resp.data.msg)
+          that.baseMsg(resp.data.msg,'error')
           }
         })
       },
@@ -294,19 +294,19 @@ export default {
           if (valid) {
             req.post(that.api.updateShopMenu,that.temp).then((resp) => {
               if(resp.data.status === 0){
-                that.successNotify('操作成功!');
+                that.baseNotify('成功','操作成功!','success');
                 this.$refs.tree.setCheckedNodes([]);
                 that.dialogFormVisible=false; // 关闭弹框
                 that.$refs['dataForm'].resetFields(); // 重置表单
                 that.resetTemp();// 重置表单数据
               }else{
-                 that.errorNotify('操作失败!');
+                 that.baseNotify('失败','操作失败!','error');
               }
             }).catch((error) => {
                 console.log(error);
             });
           } else {
-            that.error('表单验证失败!')
+            that.baseMsg('表单验证失败!','error')
           }
         })
       },
@@ -360,7 +360,7 @@ export default {
             if(resp.data.status === 0){
               that.temp = resp.data.data;
             }else{
-              that.errorNotify(resp.data.msg);
+              that.baseNotify('失败',resp.data.msg,'error');
             }
         }).catch( (error) => {
           console.log(error);
@@ -383,18 +383,15 @@ export default {
               const children = parent.data.children || parent.data;
               const index = children.findIndex(d => d.id === data.id);
               children.splice(index, 1);
-              that.successNotify(resp.data.msg);
+              that.baseNotify('成功',resp.data.msg,'success');
             }else{
-              that.errorNotify(resp.data.msg);
+              that.baseNotify('失败',resp.data.msg,'error');
             }
         }).catch((error) => {
           console.log(error)
         });
         }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
+          this.baseMsg('已经取消删除!','errir')
         });
       },
       handleSizeChange(val) {
@@ -421,34 +418,7 @@ export default {
               </el-button>
             </span>
           </span>);
-      },
-      success(msg) {
-        this.$message({
-          message: msg,
-          type: 'success',
-          duration: 1500
-        })
-      },
-      error(msg) {
-        this.$message({
-          message: msg,
-          type: 'error',
-          duration: 1500
-      })
-     },
-    successNotify(msg){
-       this.$notify({
-          title: '成功',
-          message: msg,
-          type: 'success'
-        });
-    },
-    errorNotify(msg){
-      this.$notify.error({
-        title: '错误',
-        message: msg
-      });
-    }
+      }
   }
 }
 </script>
