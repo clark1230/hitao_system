@@ -1,4 +1,4 @@
-var host = 'http://192.168.3.122:8200/'
+var host = 'http://localhost:8200/'
 window.g = {
   AXIOS_TIMEOUT: 10000, // 配置网络超时
   ApiUrl: host, // 配置服务器地址,
@@ -50,14 +50,14 @@ window.g = {
     shopBrandAPI: host + 'system/shopBrand/shopBrandAjax', // 品牌列表接口
     saveShopBrand: host + 'system/shopBrand/save', // 保存品牌信息接口
     updateShopBrand: host + 'system/shopBrand/update', // 编辑品牌信息接口
-    finShopBrand: host + 'system/shopBrand/findOne', // 获取品牌信息接口
+    findShopBrand: host + 'system/shopBrand/findOne', // 获取品牌信息接口
     removeShopBrand: host + 'system/shopBrand/remove', // 删除品牌信息
     removeBatchShopBrand: host + 'system/shopBrand/removeBatch', // 批量删除品牌信息
     shopBrandFindByClassId: host + 'system/shopBrand/findByClassId', // 根据类目编号查询品牌信息
 
     // 类目接口
     shopGoodsCategoryAPI: host + 'system/shopGoodsCategory/shopGoodsCategoryAjax',
-    shopGoodsCategory: host + 'system/shopGoodsCategory/ajaxCate',
+    shopGoodsCategory: host + 'system/shopGoodsCategory/treeData',
     catetoryFindByPId: host + 'system/shopGoodsCategory/findByPId',
 
     // 属性模板

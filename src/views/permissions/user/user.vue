@@ -3,7 +3,7 @@
     <div style="margin: 0px 0px 10px 0px;">
       <el-button @click="handleCreate" type="primary" icon='el-icon-circle-plus' plain>增加</el-button>
       <el-button type="danger" icon="el-icon-delete" plain>批量删除</el-button>
-      <el-button type="primary">授予角色</el-button>
+      <el-button @click="handleGrantRole" type="primary">授予角色</el-button>
       <el-form  class="demo-form-inline" ref="form" style="display:inline-block;" label-width="10px">
         <el-form-item >
           <el-input  placeholder="请输入搜索值!"></el-input>
@@ -62,6 +62,7 @@
       layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
     </div>
+    <!--用户增加、编辑表单-->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form :rules="rules" ref="dataForm" :model="temp" label-position="left" 
       label-width="90px" style='width: auto; margin-left:10px;'>
@@ -85,6 +86,11 @@
         <el-button v-if="dialogStatus=='create'" type="primary" @click="createData" plain>{{$t('table.confirm')}}</el-button>
         <el-button v-else type="primary" @click="updateData" plain>{{$t('table.confirm')}}</el-button>
       </div>
+    </el-dialog>
+    <!--角色授权-->
+    <el-dialog title="授予角色" :visible.sync="grantRoleDialogVisible">
+
+      哈哈
     </el-dialog>
   </div>
 </template>
@@ -125,6 +131,7 @@ export default {
         sort: '+id'
       },
       dialogFormVisible: false,  // 表单是否可见
+      grantRoleDialogVisible: false,
       dialogStatus: '',  // 对话框状态
       temp: {
         adminId: null, // 系统用户编号
@@ -162,11 +169,11 @@ export default {
       })
       .then(function(resp) {
         if(resp.data.code === 0){
-          that.success('数据加载成功!');
+          that.baseMsg('数据加载成功!','success');
           that.tableData = resp.data.data
           that.total = resp.data.count
         }else{
-          that.error('数据加载失败!');
+          that.baseMsg('数据加载失败!','error');
         }
       }).catch(function(error) {
         console.log(error)
@@ -190,20 +197,20 @@ export default {
           // 提交表单
           req.post(url,data).then((resp) =>{
             if(resp.data.status === 0){
-              that.successNotify(resp.data.msg);
+              that.baseNotify('成功',resp.data.msg,'success');
               that.dialogFormVisible = false;
               that.handleGetData(that.listQuery.page,that.listQuery.limit);
               that.$refs['dataForm'].resetFields();
               // 重置
               that.resetTemp();
             }else{
-              that.errorNotify(resp.data.msg);
+              that.baseNotify('失败',resp.data.msg,'error');
             }
           }).catch((error) => {
-            that.error(error);
+            that.baseMsg(error,'error');
           })
         } else {
-          that.error('表单验证失败!');
+          that.baseMsg('表单验证失败!','error');
           return false;
         }
       });
@@ -241,7 +248,7 @@ export default {
           that.temp = resp.data.data;
           console.log(resp.data.data);
         }else{
-          that.errorNotify(resp.data.msg);
+          that.baseNotify('失败',resp.data.msg,'error');
         }
       }).catch((error) =>{
         console.log(error);
@@ -256,53 +263,38 @@ export default {
         }).then(() => {
           req.get(that.api.deleteShopAdmin+"?adminId="+row.adminId).then((resp)=>{
             if(resp.data.status === 0){
-              that.successNotify(resp.data.msg);
+              that.baseNotify('成功',resp.data.msg,'success');
               that.handleGetData(that.listQuery.page,that.listQuery.limit);
             }else{
-              that.errorNotify(resp.data.msg);
+              that.baseNotify('失败',resp.data.msg,'error');
             }
           }).catch((error) =>{
             console.log(error);
           });
         }).catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
+          this.baseMsg('已取消删除')
         });
     },
     handleSearch(){
 
     },
-    handleRefresh(){
+    handleRefresh(){ // 刷新数据
       this.handleGetData(this.listQuery.page,this.listQuery.limit);
     },
-    success: function(msg){
-      this.$message({
-          message: msg,
-          type: 'success',
-          duration: 1500
+    handleGrantRole() { // 授予角色
+        this.grantRoleDialogVisible = true
+        // 获取角色信息
+        req.get(this.api)
+        .then((resp) =>{
+          if(resp.data.status === 0){
+            
+          }else{
+
+          }
+        }).catch((error) => {
+          console.log(error)
         })
-    },
-    error: function(msg){
-      this.$message({
-          message: msg,
-          type: 'error',
-          duration: 1500
-        })
-    },
-    successNotify(msg){
-       this.$notify({
-          title: '成功',
-          message: msg,
-          type: 'success'
-        });
-    },
-    errorNotify(msg){
-      this.$notify.error({
-        title: '错误',
-        message: msg
-      });
+        // 数据回显
     }
   }
 }

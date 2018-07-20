@@ -3,7 +3,6 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-
 module.exports = {
   dev: {
 
@@ -13,7 +12,7 @@ module.exports = {
     proxyTable: {},
 
     // Various Dev Server settings
-    host: 'localhost', // 主机名
+    host: 'localhost',// 主机名
     port: 9527, // 端口号
     autoOpenBrowser: true,  
     errorOverlay: true,

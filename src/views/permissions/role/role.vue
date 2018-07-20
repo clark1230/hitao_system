@@ -59,7 +59,7 @@
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)" title="删除" icon="el-icon-delete" plain></el-button>
-          <el-button size='mini' type='warning' title="启用/禁用" icon="el-icon-d-caret" plain></el-button>  
+          <!-- <el-button size='mini' type='warning' title="启用/禁用" icon="el-icon-d-caret" plain></el-button>   -->
         </template>
       </el-table-column>
     </el-table>

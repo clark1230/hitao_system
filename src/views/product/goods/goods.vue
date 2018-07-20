@@ -2,13 +2,6 @@
   <div class="app-container">
     <div style="margin: 0px 0px 10px 0px;">
       <div style="display:inline-block;">
-        <el-tabs v-model="activeName" @tab-click="handleClick">
-        <el-tab-pane label="上架" name="first"></el-tab-pane>
-        <el-tab-pane label="下架" name="second"></el-tab-pane>
-        <el-tab-pane label="违规" name="third"></el-tab-pane>
-      </el-tabs>
-      </div>
-      <div style="display:inline-block;">
         <el-select v-model="searchParam" placeholder="请选择搜索条件" style="display:inline-block;width:120px;">
             <el-option
               v-for="item in options"
@@ -41,7 +34,7 @@
       <el-table-column prop="goodsClick" label="点击数" width="80"></el-table-column>
       <el-table-column prop="goodsSalenum" label="销售数" width="80"></el-table-column>
       <el-table-column prop="goodsCollect" label="收藏数" width="80"></el-table-column>
-      <el-table-column  label="评分(0-5星)"  sortable>
+      <!-- <el-table-column  label="评分(0-5星)"  sortable>
         <template slot-scope="scope">
           <el-rate
             v-model="scope.row.evaluationGoodStar"
@@ -51,7 +44,7 @@
             score-template="{value}">
           </el-rate>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column prop="goodsState" label="状态" width="70">
         <template slot-scope="scope">
           <span v-if="scope.row.goodsState ===0">下架</span>
@@ -132,8 +125,8 @@
           }
         })
           .then(function(resp) {
-            that.tableData = resp.data.data
-            that.total = resp.data.count
+            that.tableData = resp.data.data.data
+            that.total = resp.data.data.count
           }).catch(function(error) {
             console.log(error)
           })

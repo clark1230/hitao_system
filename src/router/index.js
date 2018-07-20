@@ -187,7 +187,8 @@ export const asyncRouterMap = [
     children: [
       { path: 'user', 'component': _import('permissions/user/user'), name: 'user', meta: { title: 'user', noCache: true }},
       { path: 'permission', component: _import('permissions/permission/permission'), name: 'permission', meta: { title: 'permission', noredirect: true }},
-      { path: 'role', component: _import('permissions/role/role'), name: 'role', meta: { title: 'role', noCache: true, roles: ['admin'] }}
+      { path: 'role', component: _import('permissions/role/role'), name: 'role', meta: { title: 'role', noCache: true }},
+      { path: 'grantPermission', component: _import('permissions/role/grantPermission'), name: 'grantPermission', meta: { title: 'grantPermission', noCache: true }}
     ]
   },
   {
