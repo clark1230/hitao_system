@@ -188,7 +188,7 @@ export const asyncRouterMap = [
       { path: 'user', 'component': _import('permissions/user/user'), name: 'user', meta: { title: 'user', noCache: true }},
       { path: 'permission', component: _import('permissions/permission/permission'), name: 'permission', meta: { title: 'permission', noredirect: true }},
       { path: 'role', component: _import('permissions/role/role'), name: 'role', meta: { title: 'role', noCache: true }},
-      { path: 'grantPermission', component: _import('permissions/role/grantPermission'), name: 'grantPermission', meta: { title: 'grantPermission', noCache: true }}
+      { path: 'grantPermission', component: _import('permissions/role/grantPermission'), hidden: true, name: 'grantPermission', meta: { title: 'grantPermission', noCache: true }}
     ]
   },
   {
@@ -204,9 +204,11 @@ export const asyncRouterMap = [
     },
     children: [
       { path: 'addGoods', component: _import('product/goods/addGoods'), name: 'addGoods', meta: { title: 'addGoods', noCache: true }},
+      { path: 'editGoods', component: _import('product/goods/editGoods'), hidden: true, name: 'editGoods', meta: { title: 'editGoods', noCache: true }},
       { path: 'goods', component: _import('product/goods/goods'), name: 'goods', meta: { title: 'goods', noCache: true }},
       { path: 'brand', component: _import('product/brand/brand'), name: 'brand', meta: { title: 'brand', noCache: true }},
-      { path: 'category', component: _import('product/category/category'), name: 'category', meta: { title: 'category', noCache: true }}
+      { path: 'category', component: _import('product/category/category'), name: 'category', meta: { title: 'category', noCache: true }},
+      { path: 'attrTemplate', component: _import('product/category/attrTemplate'), hidden: true, name: 'attrTemplate', meta: { title: 'attrTemplate', noCache: true }}
     ]
   },
   {

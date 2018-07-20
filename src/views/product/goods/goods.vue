@@ -27,13 +27,13 @@
           <img :src="scope.row.mainImage" style="transform:scale(1.3);height:35px;"/>
         </template>
       </el-table-column>
-      <el-table-column prop="goodsStorage" label="库存"  sortable width="80"></el-table-column>
-      <el-table-column prop="goodsPrice" label="价格(￥)" width="90"></el-table-column>
-      <el-table-column prop="goodsMarketprice" label="市场价格(￥)" width="90"></el-table-column>
-      <el-table-column prop="evaluationCount" label="评价数" width="80"></el-table-column>
-      <el-table-column prop="goodsClick" label="点击数" width="80"></el-table-column>
-      <el-table-column prop="goodsSalenum" label="销售数" width="80"></el-table-column>
-      <el-table-column prop="goodsCollect" label="收藏数" width="80"></el-table-column>
+      <el-table-column prop="goodsStorage" label="库存"></el-table-column>
+      <el-table-column prop="goodsPrice" label="价格(￥)"></el-table-column>
+      <el-table-column prop="goodsMarketprice" label="市场价格(￥)"></el-table-column>
+      <el-table-column prop="evaluationCount" label="评价数"></el-table-column>
+      <el-table-column prop="goodsClick" label="点击数" ></el-table-column>
+      <el-table-column prop="goodsSalenum" label="销售数"></el-table-column>
+      <el-table-column prop="goodsCollect" label="收藏数"></el-table-column>
       <!-- <el-table-column  label="评分(0-5星)"  sortable>
         <template slot-scope="scope">
           <el-rate
@@ -45,27 +45,27 @@
           </el-rate>
         </template>
       </el-table-column> -->
-      <el-table-column prop="goodsState" label="状态" width="70">
+      <el-table-column prop="goodsState" label="状态" width="80">
         <template slot-scope="scope">
           <span v-if="scope.row.goodsState ===0">下架</span>
           <span v-if="scope.row.goodsState ===1">正常</span>
           <span v-if="scope.row.goodsState ===10">违规</span>
         </template>
       </el-table-column>
-      <el-table-column prop="goodsVerify" label="审核" width="70">
+      <el-table-column prop="goodsVerify" label="审核" width="80">
         <template slot-scope="scope">
           <span v-if="scope.row.goodsVerify ===0">未通过</span>
           <span v-if="scope.row.goodsVerify ===1">已通过</span>
           <span v-if="scope.row.goodsVerify ===10">审核中</span>
         </template>
       </el-table-column>
-      <el-table-column label="删除" width="60">
+      <el-table-column label="删除" width="70">
         <template slot-scope="scope">
           <el-tag type="primary" v-if="scope.row.isDel === 0">否</el-tag>
           <el-tag type="danger" v-if="scope.row.isDel === 1">是</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="180">
         <template slot-scope="scope">
           <el-button
             size="mini"
@@ -125,8 +125,13 @@
           }
         })
           .then(function(resp) {
-            that.tableData = resp.data.data.data
-            that.total = resp.data.data.count
+            if(resp.data.status === 0){
+              that.tableData = resp.data.data.data
+              that.total = resp.data.data.count
+              that.baseMsg('数据加载成功!','success')
+            }else{
+              that.baseMsg('数据加载失败!','error')
+            }
           }).catch(function(error) {
             console.log(error)
           })
@@ -142,10 +147,13 @@
       handleRefresh() {
         this.searchParam = ''
         this.searchValue = ''
-        this.handleGetData(1,15)
+        this.handleGetData(this.listQuery.page,this.listQuery.limit)
       },
       handleSearch(){
 
+      },
+      handleEdit(index,row) { // 跳转到编辑商品页面
+        this.$router.push({ path: 'editGoods', query: {goodsId: row.goodsId }})
       }
     }
   }

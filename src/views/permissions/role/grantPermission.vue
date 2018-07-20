@@ -1,42 +1,41 @@
 <template>
   <div>
-    <ul class="role-table col-xs-offset-2 col-md-offset-1 col-sm-offset-2">
+   <ul class="role-table col-xs-offset-2 col-md-offset-1 col-sm-offset-2">
     <li class="header">
         <div class="left">菜单列表</div>
         <div class="right">功能权限</div>
     </li>
     <div class="vertical-line"></div>
     <li  v-for="(item, index) in dataList" :key="item.id">
-        <!--权限组信息-->
         <div class="left h40"  @click="fold(item)">
             <i :class="{'el-icon-caret-right':item.folded,'el-icon-caret-bottom':!item.folded}"
                v-cloak v-if="item.second"
                class="item-icon"></i>
             <el-checkbox @click.native="handleOneCheckAll($event,item)" v-cloak v-if="!item.second" :indeterminate="item.isIndeterminate" v-model="item.checkAll"> {{item.title}}</el-checkbox>
-                <span v-if="item.second" v-cloak>{{item.title}}</span>
+            <span v-if="item.second" v-cloak>{{item.title}}</span>
         </div>
         <div class="right h40">
-            <el-checkbox v-if="item.second" :indeterminate="item.isIndeterminate"
-             @change="checkSecondAll(item)" v-model="item.firstCheckAll"> 所有</el-checkbox>
+            <el-checkbox v-if="item.second" :indeterminate="item.isIndeterminate" 
+            @change="checkSecondAll(item)" v-model="item.firstCheckAll"> 所有</el-checkbox>
             <el-checkbox-group v-model="item.checkedCities" @change="handleOneCheckedCitiesChange(item)" v-else>
-                 <el-checkbox  v-for="m in item.list" :label="m.id" :key="m.id" v-cloak> {{m.name}}</el-checkbox>
+                 <el-checkbox  v-for="m in item.list" :label="m.id" :key="m.id" v-cloak>
+                      {{m.name}}
+                 </el-checkbox>
             </el-checkbox-group>
         </div>
         <div class="line"></div>
         <ul v-show="item.second&&!item.folded">
-            <li class="h40" v-for="(second, cur) in item.second" :key="second.id">
-                <!--左侧权限信息-->
+            <li class="h40" v-for="(second,cur) in item.second" :key="second.id">
                 <div class="left">
-                    <el-checkbox   v-model="second.checkedAll" @change="handleCheckAllChange($event,item,second)" v-cloak>
+                    <el-checkbox :indeterminate="second.isIndeterminate"  v-model="second.checkAll" @change="handleCheckAllChange($event,item,second)" v-cloak>
                         {{second.title}}
                     </el-checkbox>
                 </div>
-                <!--右侧权限信息-->
                 <div class="right">
-                    <el-checkbox-group v-model="second.checkedCities" @change="handleCheckedCitiesChange(item,second)">
-                        <el-checkbox v-for="p in second.list" :label="p.id" :key="p.id" v-cloak >
+                    <el-checkbox-group v-model="second.checkedCities"  @change="handleCheckedCitiesChange($event,item,second)">
+                        <el-checkbox  v-for="p in second.list" :label="p.id" :key="p.id" v-cloak >
                             {{p.name}}
-                        </el-checkbox>
+                    </el-checkbox>
                     </el-checkbox-group>
                 </div>
                 <div class="line"></div>
@@ -51,127 +50,204 @@ export default {
   data() {
     return {
       dataList: [
-        {
-          title: "概况",
-          id: "0",
-          checkedCities: [],
-          list: [
-            {
-              name: "浏览",
-              id: "10001"
-            },
-            {
-              name: "修改",
-              id: "11111"
-            }
-          ]
-        },
+        // {
+        //   title: "概况",
+        //   id: "0",
+        //   checkedCities: [],
+        //   list: [
+        //     {
+        //       name: "浏览",
+        //       id: "10000"
+        //     },
+        //     {
+        //       name: "新增",
+        //       id: "10001",
+        //     },
+        //     {
+        //       name: "修改",
+        //       id: "10002",
+        //       checked: true
+        //     },
+        //     {
+        //       name: "删除",
+        //       id: "20002",
+        //       checked: true
+        //     }
+        //   ]
+        // },
         {
           title: "权限管理",
-          id: "4",
+          id: "1",
           second: [
             {
-              title: "角色管理",
-              id: "111",
+              title: "用户管理",
+              id: "11",
               list: [
                 {
-                  name: "浏览",
-                  id: "112"
+                  id: "10003",
+                  name: "浏览"
                 },
                 {
                   name: "新增",
-                  id: "113"
+                  id: "10004"
                 },
                 {
                   name: "修改",
-                  id: "114"
-                },
-                {
-                  name: "删除",
-                  id: "115"
+                  id: "10005"
                 }
               ],
               checkedCities: []
             },
             {
-              title: "用户管理",
-              id: "116",
+              title: "角色管理",
+              id: "12",
               list: [
                 {
                   name: "浏览",
-                  id: "117"
+                  id: "10005"
                 },
                 {
                   name: "新增",
-                  id: "118"
+                  id: "10007"
                 },
                 {
                   name: "修改",
-                  id: "119"
+                  id: "10008"
                 },
                 {
                   name: "删除",
-                  id: "120"
+                  id: "10009"
+                }
+              ],
+              checkedCities: []
+            },
+            {
+              title: "权限管理",
+              id: "13",
+              list: [
+                {
+                  name: "浏览",
+                  id: "10010"
+                },
+                {
+                  name: "新增",
+                  id: "10011"
+                },
+                {
+                  name: "修改",
+                  id: "10012"
+                },
+                {
+                  name: "删除",
+                  id: "10013"
+                }
+              ],
+              checkedCities: []
+            }
+          ]
+        },
+        {
+          title: "服务网关管理",
+          id: "2",
+          second: [
+            {
+              title: "网关管理",
+              id: "14",
+              list: [
+                {
+                  id: "10014",
+                  name: "浏览"
+                  
+                },
+                {
+                  name: "新增",
+                  id: "10015"
+                },
+                {
+                  name: "修改",
+                  id: "10016"
+                },
+                {
+                  name: "删除",
+                  id: "10017"
                 }
               ],
               checkedCities: []
             }
           ]
         }
-      ]
+      ],
+      permissionData: []
     };
   },
   created() {
-    this.$store.getters.grantPermissionData = this.permissionData;
+    this.$store.getters.grantPermissionData = this.dataList;
   },
   methods: {
-    fold: function(item) { // 折叠
+    fold: function(item) {
+      // 折叠
       if (typeof item.folded === "undefined") {
-        this.$set(item, "folded", true);
+        this.$set(item, "folded", false);
       } else {
         item.folded = !item.folded;
       }
     },
     // 全选一项
-    handleCheckAllChange(event, item, second) {
-      let arr = [];
-      for (let a = 0; a < second.list.length; a++) {
-        arr.push(second.list[a].id);
-      }
+    handleCheckAllChange(checked, item, second) {
       if (typeof second.checkedCities === "undefined") {
-        this.$set(second, "checkedCities", arr);
+        this.$set(second, "checkedCities", []);
       }
-      second.checkedCities = event.target.checked ? arr : [];
-      // if (typeof second === "undefined") {
-      //     this.$set(second, "isIndeterminate", false)
-      // }
-      // second.isIndeterminate = false;
-      if (typeof second.checkAll === "undefined") {
-        this.$set(second, "checkAll", true);
+      if (typeof second.list !== "undefined") {
+        this.$set(second, "checked", false);
       }
       if (typeof item.isIndeterminate === "undefined") {
-        this.$set(item, "isIndeterminate", true);
+        this.$set(item, "isIndeterminate", false);
       }
-      for (let a = 0; a < item.second.length; a++) {
-        if (!item.second[a].checkAll) {
-          item.isIndeterminate = true;
-          for (let a = 0; a < item.second.length; a++) {
-            if (item.second[a].checkAll) {
-              break;
-            } else {
-              item.isIndeterminate = false;
-              item.firstCheckAll = false;
-            }
+      if (checked) {
+        // 说明勾选了
+        var checkedNum = 0;
+        item.second.forEach(ele => {
+          if (ele.checkAll) {
+            checkedNum++;
           }
-          break;
-        } else {
-          item.isIndeterminate = false;
+        });
+        if (checkedNum === item.second.length) {
           item.firstCheckAll = true;
+          item.isIndeterminate = false;
+        } else {
+          item.firstCheckAll = false;
+          item.isIndeterminate = true;
+        }
+      } else {
+        var unCheckedNum = 0;
+        item.second.forEach(ele => {
+          if (!ele.checkAll) {
+            unCheckedNum++;
+          }
+        });
+        if (unCheckedNum === item.second.length) {
+          console.log("全部取消");
+          item.firstCheckAll = false;
+          item.isIndeterminate = false;
+        } else {
+          item.firstCheckAll = false;
+          item.isIndeterminate = true;
         }
       }
+      if (second.checkAll) {
+        second.isIndeterminate = false;
+        second.list.forEach(ele => {
+          second.checkedCities.push(ele.id);
+        });
+      } else {
+        second.checkedCities = [];
+        second.isIndeterminate = false;
+      }
+      second.checkedAll = second.checkedAll === true ? false : true;
     },
     // 单选
-    handleCheckedCitiesChange(item, second) {
+    handleCheckedCitiesChange(checkedArr, item, second) {
+      second.checkedCities = checkedArr;
       let checkedCount = second.checkedCities.length;
       if (typeof second.checkAll === "undefined") {
         this.$set(second, "checkAll", false);
@@ -180,36 +256,40 @@ export default {
         this.$set(second, "isIndeterminate", false);
       }
       if (typeof item.isIndeterminate === "undefined") {
-        this.$set(item, "isIndeterminate", true);
+        this.$set(item, "isIndeterminate", false);
       }
+      second.checkAll = checkedCount === second.list.length;
       second.isIndeterminate =
         checkedCount > 0 && checkedCount < second.list.length;
-      second.checkAll = checkedCount === second.list.length;
-      if (checkedCount === 0) {
-        second.isIndeterminate = false;
-      }
-      for (let a = 0; a < item.second.length; a++) {
-        if (!item.second[a].checkAll) {
-          item.isIndeterminate = true;
-          for (let b = 0; b < item.second.length; b++) {
-            if (item.second[b].checkedCities.length > 0) {
-              break;
-            } else {
-              item.isIndeterminate = false;
-              item.firstCheckAll = false;
+      if (item.checkedAll) {
+        item.isIndeterminate = false;
+        item.checkedAll = true;
+      } else {
+        for (let a = 0; a < item.second.length; a++) {
+          if (!item.second[a].checkAll) {
+            item.isIndeterminate = true;
+            for (let b = 0; b < item.second.length; b++) {
+              if (item.second[b].checkedCities.length > 0) {
+                item.isIndeterminate = true;
+                item.checkedAll = false;
+                break;
+              } else {
+                item.isIndeterminate = false;
+                item.firstCheckAll = false;
+              }
             }
+            break;
+          } else {
+            item.isIndeterminate = false;
+            item.firstCheckAll = true;
           }
-          break;
-        } else {
-          item.isIndeterminate = false;
-          item.firstCheckAll = true;
         }
       }
     },
     // 点击所有
     checkSecondAll: function(item) {
       if (typeof item.firstCheckAll === "undefined") {
-        this.$set(item, "firstCheckAll", true);
+        this.$set(item, "firstCheckAll", false);
       }
       for (let a = 0; a < item.second.length; a++) {
         this.checkItemAll(item.firstCheckAll, item.second[a]);
@@ -218,6 +298,7 @@ export default {
     },
     checkItemAll: function(flag, item) {
       let arr = [];
+      console.log(item)
       for (let a = 0; a < item.list.length; a++) {
         arr.push(item.list[a].id);
       }
@@ -230,6 +311,7 @@ export default {
 
     // 没有二级菜单
     handleOneCheckedCitiesChange: function(item) {
+      console.log(item)
       let checkedCount = item.checkedCities.length;
       if (typeof item.isIndeterminate === "undefined") {
         this.$set(item, "isIndeterminate", false);
@@ -237,17 +319,68 @@ export default {
       if (typeof item.checkAll === "undefined") {
         this.$set(item, "checkAll", false);
       }
-      item.isIndeterminate =
-        checkedCount > 0 && checkedCount < item.list.length;
+      item.isIndeterminate = checkedCount > 0 && checkedCount < item.list.length;
       item.checkAll = checkedCount === item.list.length;
+      // 修改同级权限信息
+      this.dataList.forEach((ele) => {
+          if(ele.second !== undefined && ele.second.length >0){
+              if(ele.firstCheckAll === 'undefined'){
+                  this.$set(ele, "firstCheckAll", false);
+              }
+              ele.isIndeterminate = true
+              ele.checkAll = false
+              ele.second.forEach((subEle) => {
+                  if (typeof subEle.isIndeterminate === "undefined") {
+                    this.$set(subEle, "isIndeterminate", false);
+                }
+                  subEle.isIndeterminate = true
+                //   subEle.list.forEach( (list) => {
+                    
+                //   })
+                subEle.checkedCities = []
+              })
+          }
+      })
     },
+    // 概况全选
     handleOneCheckAll: function(event, item) {
+      var that = this
       let arr = [];
       for (let a = 0; a < item.list.length; a++) {
         arr.push(item.list[a].id);
       }
-
       item.checkedCities = event.target.checked ? arr : [];
+      if(item.checkedCities.length = item.list.length){
+          item.checkAll = true;
+          item.isIndeterminate = false;
+      }else{
+          item.isIndeterminate = true;
+          item.checkedNum = false
+      }
+      // 把一下所有的数据的都遍历勾选
+      if(event.target.checked){
+        this.dataList.forEach((ele) => {
+          if(ele.second !== undefined && ele.second.length >0){
+              if(ele.firstCheckAll === 'undefined'){
+                  this.$set(ele, "firstCheckAll", true);
+              }
+              ele.firstCheckAll =true;
+              that.checkSecondAll(ele)
+          }
+        })
+      }else{
+          // 取消全部选择
+          this.dataList.forEach((ele) => {
+          if(ele.second !== undefined && ele.second.length >0){
+              if(ele.firstCheckAll === 'undefined'){
+                  this.$set(ele, "firstCheckAll", true);
+              }
+              ele.firstCheckAll =false;
+              that.checkSecondAll(ele)
+          }
+        })
+      }
+      
     }
   }
 };

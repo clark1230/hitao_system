@@ -3,7 +3,7 @@
     <div style="margin: 0px 0px 10px 0px;">
       <el-button @click="handleCreate" type="primary" icon='el-icon-circle-plus' plain>增加</el-button>
       <el-button type="danger" icon="el-icon-delete" plain>批量删除</el-button>
-      <el-button type="success" plain="">授予权限</el-button>
+      <el-button @click="showGrantPermission" type="success" plain="">授予权限</el-button>
       <el-form  class="demo-form-inline" ref="form" style="display:inline-block;" label-width="10px">
         <el-form-item >
           <el-input  placeholder="请输入搜索值!"></el-input>
@@ -59,7 +59,7 @@
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)" title="删除" icon="el-icon-delete" plain></el-button>
-          <!-- <el-button size='mini' type='warning' title="启用/禁用" icon="el-icon-d-caret" plain></el-button>   -->
+          <el-button size='mini' type='warning' title="启用/禁用" icon="el-icon-d-caret" plain></el-button>  
         </template>
       </el-table-column>
     </el-table>
@@ -90,12 +90,24 @@
         <el-button v-else type="primary" @click="updateData" plain>{{$t('table.confirm')}}</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog width="70%" top="5vh" :append-to-body="true" :center="true" title="角色授权" :visible.sync="dialogRoleVisible">
+      <div style="height:550px;overflow:auto;">
+        <grant-permission :is-edit='false'></grant-permission>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogRoleVisible = false" plain>{{$t('table.cancel')}}</el-button>
+        <el-button type="primary" @click="handleGrantPermission" plain>确定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-  import req from '@/utils/request'
+  import req from '@/utils/request' 
+  import grantPermission  from  './grantPermission'
   export default {
+    components: { grantPermission },
     data() {
       return {
         tableData: [],
@@ -109,6 +121,7 @@
           sort: '+id'
         },
         dialogFormVisible: false,
+        dialogRoleVisible: false,
         dialogStatus: '',
         temp: {
           roleName: '',
@@ -127,9 +140,9 @@
       this.handleGetData(this.listQuery.page, this.listQuery.limit)
     },
     methods: {
-      handleGetData(page, limit) { // 加载数据
+      handleGetData(page, limit) {
         var that = this
-        req.get(this.api.shopRoleAPI, {
+        req.get('authc/shopRole/shopRoleAjax', {
           params: {
             page: page,
             limit: limit
@@ -137,17 +150,17 @@
         })
           .then(function(resp) {
             if(resp.data.code === 0){
-              that.baseMsg('数据加载成功!','success');
+              that.success('数据加载成功!');
               that.tableData = resp.data.data
               that.total = resp.data.count
             }else{
-              that.baseMsg('数据加载失败!','error');
+              that.error('数据加载失败!');
             }
           }).catch(function(error) {
             console.log(error)
           })
       },
-      handleDelete(index, row) { // 删除数据
+      handleDelete(index, row) {
         var that = this
         this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
           confirmButtonText: '确定',
@@ -162,23 +175,50 @@
           })
           .then(function(resp) {
               if (resp.data.status === 0) {
-                that.baseMsg(resp.data.msg,'success');
+                that.success(resp.data.msg);
                 that.handleGetData(that.listQuery.page,that.listQuery.limit);
               } else {
-                that.baseMsg(resp.data.msg,'error')
+                that.error(resp.data.msg)
               }
             }).catch((error) =>{
               console.log(error);
             });
         }).catch(() => {
-          this.baseMsg('已经取消删除!','error')
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
         });
+      },
+      showGrantPermission(){ // 为角色授予权限
+        this.dialogRoleVisible = true
+        //this.router.push('grantPermission')
+      },
+      handleGrantPermission() {
+        console.log(this.$store.getters.grantPermissionData)
+        var permissionData = this.$store.getters.grantPermissionData
+        // if(permissionData.length > 0){
+
+        // }else{
+        //   this.baseMsg('请选择要授权的数据?','error')
+        // }
+        var data = [];
+        permissionData.forEach((ele) => {
+          console.log(typeof ele.second.isIndeterminate)
+          if(ele.isIndeterminate || ele.firstCheckAll){
+            data.push(ele)
+          }
+        })
+        console.log(data)
+        if(data.length == 0){
+          this.baseMsg('请选择要授权的数据?','error')
+        }
       },
       handleEdit(index, row) {
         var roleId = row.roleId
         var that = this;
         this.dialogStatus = 'update';
-        req.get(this.api.shopRoleFindOne, {
+        req.get(that.myConfig.host + 'authc/shopRole/findOne', {
           params: {
             roleId: roleId
           }
@@ -187,12 +227,12 @@
             if (resp.data.status === 0) {
               that.dialogFormVisible = true
               that.temp = resp.data.data
-              this.dialogStatus = 'update'
-              this.$nextTick(() => {
-                this.$refs['dataForm'].clearValidate()
+              that.dialogStatus = 'update'
+              that.$nextTick(() => {
+                that.$refs['dataForm'].clearValidate()
               })
             } else {
-              that.baseMsg('数据获取失败!','error')
+              that.error('数据获取失败!')
             }
           })
           .catch(function(error) {
@@ -221,18 +261,18 @@
           this.$refs['dataForm'].clearValidate()
         })
       },
-      createData: function() { // 添加角色信息
+      createData: function() {
         var that = this
         this.$refs['dataForm'].validate((valid) => {
           console.log(valid)
           if (valid) {
-            req.post(this.api.addShopRole, this.temp)
+            req.post('authc/shopRole/addShopRole', this.temp)
               .then(function(resp) {
                 if (resp.data.status === 0) {
-                  that.baseMsg(resp.data.msg,'success')
+                  that.success(resp.data.msg)
                   that.dialogFormVisible = false
                 } else {
-                  that.baseMsg(resp.data.msg,'error')
+                  that.error(resp.data.msg)
                 }
               })
               .catch(function(error) {
@@ -241,27 +281,41 @@
           }
         })
       },
-      updateData: function() { // 编辑角色信息
+      updateData: function() {
         var that = this
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            req.post(this.api.updateShopRole, that.temp)
+            req.post('authc/shopRole/updateShopRole', that.temp)
             .then(function(resp) {
               if (resp.data.status === 0) {
-                that.baseMsg(resp.data.msg,'success')
+                that.success(resp.data.msg)
                 that.dialogFormVisible = false
               } else {
-                that.baseMsg(resp.data.msg,'error')
+                that.error(resp.data.msg)
               }
             })
           }
         })
       },
-      resetTemp: function() { // 重置表单
+      resetTemp: function() {
         this.temp = {
           roleName: '',
           roleDescription: ''
         }
+      },
+      success(msg) {
+        this.$message({
+          message: msg,
+          type: 'success',
+          duration: 1500
+        })
+      },
+      error(msg) {
+        this.$message({
+          message: msg,
+          type: 'error',
+          duration: 1500
+        })
       }
     }
   }
