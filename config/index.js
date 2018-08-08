@@ -12,7 +12,7 @@ module.exports = {
     proxyTable: {},
 
     // Various Dev Server settings
-    host: 'localhost',// 主机名
+    host: '192.168.3.146',// 主机名
     port: 9527, // 端口号
     autoOpenBrowser: true,  
     errorOverlay: true,

@@ -2,7 +2,7 @@
   <div class="app-container">
     <div style="margin: 0px 0px 10px 0px;">
       <el-button @click="handleCreate" type="primary" icon='el-icon-circle-plus' plain>增加</el-button>
-      <el-button type="danger" icon="el-icon-delete" plain>批量删除</el-button>
+      <el-button @click="handleBatchRemove" type="danger" icon="el-icon-delete" plain>批量删除</el-button>
       <el-button @click="handleGrantRole" type="primary">授予角色</el-button>
       <el-form  class="demo-form-inline" ref="form" style="display:inline-block;" label-width="10px">
         <el-form-item >
@@ -13,6 +13,8 @@
       <el-button @click="handleRefresh" icon="el-icon-refresh">刷新</el-button>
     </div>
     <el-table
+      ref="multipleTable"
+      @selection-change="handleSelectionChange"
       :data="tableData"
       stripe
       border
@@ -89,8 +91,17 @@
     </el-dialog>
     <!--角色授权-->
     <el-dialog title="授予角色" :visible.sync="grantRoleDialogVisible">
-
-      哈哈
+      <div>
+        <el-checkbox-group v-model="roleIdArr">
+          <div style="display:inline-block;margin-right:10px;" v-for="(role, subIndex) in roleData" :key="subIndex">
+            <el-checkbox border  :label="role.roleId" name="type">{{role.roleName}}</el-checkbox>
+          </div>
+        </el-checkbox-group>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancelGrantRole" plain>{{$t('table.cancel')}}</el-button>
+        <el-button @click="handleGrantRoleData" type="primary" plain>{{$t('table.confirm')}}</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -107,11 +118,11 @@ export default {
           adminName: value
         }}).then((resp) => {
           if(resp.data.status === 0){
-            that.successNotify(resp.data.msg);
+            that.baseNotify('成功',resp.data.msg,'success');
             callback()
           }else{
-            that.errorNotify(resp.data.msg);
-            callback(new Error(resp.data.msg));
+            that.baseNotify(resp.data.msg);
+            callback(new Error('失败',resp.data.msg,'error'));
           }
         }).catch((error) => {
           console.log(error);
@@ -120,9 +131,9 @@ export default {
       }
     }
     return {
-      tableData: [],
-      total: 0,
-      listQuery: {
+      tableData: [], // 管理员表格数据
+      total: 0, // 总记录数
+      listQuery: {  // 分页查询
         page: 1,
         limit: 15,
         importance: undefined,
@@ -130,6 +141,9 @@ export default {
         type: undefined,
         sort: '+id'
       },
+      adminIdArr:[], // 管理员编号数组
+      roleData:[], // 角色信息
+      roleIdArr:[], // 角色编号数组
       dialogFormVisible: false,  // 表单是否可见
       grantRoleDialogVisible: false,
       dialogStatus: '',  // 对话框状态
@@ -143,7 +157,7 @@ export default {
         update: '修改',
         create: '新增'
       },
-      rules: {
+      rules: { // 表单验证规则
         adminName: [
           { required: true, message: '请输入系统用户名称!', trigger: 'blur' },
           { required: true, message: '该用户已经存在!',trigger: 'blur', validator: checkAdminNameExists}
@@ -159,7 +173,7 @@ export default {
     this.handleGetData(this.listQuery.page, this.listQuery.limit)
   },
   methods: {
-    handleGetData(page, limit) {
+    handleGetData(page, limit) { // 获取管理员数据
       var that = this
       req.get(that.api.shopAdminAPI, {
         params: {
@@ -168,10 +182,10 @@ export default {
         }
       })
       .then(function(resp) {
-        if(resp.data.code === 0){
+        if(resp.data.status === 0){
           that.baseMsg('数据加载成功!','success');
-          that.tableData = resp.data.data
-          that.total = resp.data.count
+          that.tableData = resp.data.data.data
+          that.total = resp.data.data.count
         }else{
           that.baseMsg('数据加载失败!','error');
         }
@@ -179,11 +193,11 @@ export default {
         console.log(error)
       })
     },
-    handleCancel(){
+    handleCancel(){ // 取消
       this.dialogFormVisible = false;
       this.$refs['dataForm'].resetFields();
     },
-    handleCreate() {
+    handleCreate() { 
       this.dialogStatus = 'create';
       this.dialogFormVisible = true;
     },
@@ -275,26 +289,100 @@ export default {
           this.baseMsg('已取消删除')
         });
     },
+    handleBatchRemove() {
+      var that = this;
+      var data = 'adminIds='+this.adminIdArr
+      console.log(this.adminIdArr)
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          req.get(that.api.deleteBatchShopAdmin+"?adminIds="+that.adminIdArr).then((resp)=>{
+            if(resp.data.status === 0){
+              that.baseNotify('成功',resp.data.msg,'success');
+              that.handleGetData(that.listQuery.page,that.listQuery.limit);
+            }else{
+              that.baseNotify('失败',resp.data.msg,'error');
+            }
+          }).catch((error) =>{
+            console.log(error);
+          });
+        }).catch(() => {
+          this.adminIdArr = []
+          this.baseMsg('已取消删除')
+        });
+    },
     handleSearch(){
 
+    },
+    handleSelectionChange(val) {
+      var that = this
+      val.forEach((ele) => {
+        that.adminIdArr.push(ele.adminId)
+      })
     },
     handleRefresh(){ // 刷新数据
       this.handleGetData(this.listQuery.page,this.listQuery.limit);
     },
+    cancelGrantRole() { // 取消授予角色
+      this.grantRoleDialogVisible=false
+      this.$refs.multipleTable.clearSelection(); // 清空表格选择
+      this.adminIdArr = [];
+      this.roleIdArr = [];
+    },
     handleGrantRole() { // 授予角色
-        this.grantRoleDialogVisible = true
-        // 获取角色信息
-        req.get(this.api)
-        .then((resp) =>{
-          if(resp.data.status === 0){
-            
-          }else{
-
-          }
-        }).catch((error) => {
-          console.log(error)
-        })
-        // 数据回显
+      var that = this
+      if(this.adminIdArr.length <=0){
+        this.baseMsg('请选择要授予角色的用户!','error');
+        return false;
+      }
+      // 获取角色信息
+      req.get(that.api.findAllShopRole)
+      .then((resp) =>{
+        if(resp.data.status === 0){
+          that.grantRoleDialogVisible = true
+          that.roleData = resp.data.data
+        }else{
+          that.baseNotify('失败',resp.data.msg,'error');
+        }
+      }).catch((error) => {
+        console.log(error)
+      });
+      // 数据回显
+      req.get(that.api.shopAdminFindRole, {
+        params: {
+          adminId: that.adminIdArr[0]
+        }
+      }).then((resp) => {
+        if(resp.data.status === 0){
+          that.roleIdArr = resp.data.data
+        }
+      }).catch((error) => {
+        console.log(error)
+      })
+    },
+    handleGrantRoleData() { // 保存授予的角色信息
+      var that = this
+      if(this.roleIdArr.length <=0){
+        this.baseMsg('请选用角色!','error');
+        return false;
+      }
+      req.get(that.api.shopAdminGrantRole+"?adminIds="+that.adminIdArr+"&roleIds="+that.roleIdArr)
+          .then((resp)=>{
+            that.adminIdArr = []
+            that.roleIdArr = []
+            that.$refs.multipleTable.clearSelection(); // 清空表格选择
+            if(resp.data.status === 0){
+              that.grantRoleDialogVisible = false
+              that.baseNotify('成功',resp.data.msg,'success');
+              that.handleGetData(that.listQuery.page,that.listQuery.limit);
+            }else{
+              that.baseNotify('失败',resp.data.msg,'error');
+            }
+          }).catch((error) =>{
+            console.log(error);
+          });
     }
   }
 }

@@ -46,142 +46,133 @@
 </div>
 </template>
 <script>
+import req from '@/utils/request'
 export default {
   data() {
     return {
-      dataList: [
-        // {
-        //   title: "概况",
-        //   id: "0",
-        //   checkedCities: [],
-        //   list: [
-        //     {
-        //       name: "浏览",
-        //       id: "10000"
-        //     },
-        //     {
-        //       name: "新增",
-        //       id: "10001",
-        //     },
-        //     {
-        //       name: "修改",
-        //       id: "10002",
-        //       checked: true
-        //     },
-        //     {
-        //       name: "删除",
-        //       id: "20002",
-        //       checked: true
-        //     }
-        //   ]
-        // },
-        {
-          title: "权限管理",
-          id: "1",
-          second: [
-            {
-              title: "用户管理",
-              id: "11",
-              list: [
-                {
-                  id: "10003",
-                  name: "浏览"
-                },
-                {
-                  name: "新增",
-                  id: "10004"
-                },
-                {
-                  name: "修改",
-                  id: "10005"
-                }
-              ],
-              checkedCities: []
-            },
-            {
-              title: "角色管理",
-              id: "12",
-              list: [
-                {
-                  name: "浏览",
-                  id: "10005"
-                },
-                {
-                  name: "新增",
-                  id: "10007"
-                },
-                {
-                  name: "修改",
-                  id: "10008"
-                },
-                {
-                  name: "删除",
-                  id: "10009"
-                }
-              ],
-              checkedCities: []
-            },
-            {
-              title: "权限管理",
-              id: "13",
-              list: [
-                {
-                  name: "浏览",
-                  id: "10010"
-                },
-                {
-                  name: "新增",
-                  id: "10011"
-                },
-                {
-                  name: "修改",
-                  id: "10012"
-                },
-                {
-                  name: "删除",
-                  id: "10013"
-                }
-              ],
-              checkedCities: []
-            }
-          ]
-        },
-        {
-          title: "服务网关管理",
-          id: "2",
-          second: [
-            {
-              title: "网关管理",
-              id: "14",
-              list: [
-                {
-                  id: "10014",
-                  name: "浏览"
+      // dataList: [
+      //   {
+      //     title: "权限管理",
+      //     id: "1",
+      //     second: [
+      //       {
+      //         title: "用户管理",
+      //         id: "11",
+      //         list: [
+      //           {
+      //             id: "10003",
+      //             name: "浏览"
+      //           },
+      //           {
+      //             name: "新增",
+      //             id: "10004"
+      //           },
+      //           {
+      //             name: "修改",
+      //             id: "10005"
+      //           }
+      //         ],
+      //         checkedCities: []
+      //       },
+      //       {
+      //         title: "角色管理",
+      //         id: "12",
+      //         list: [
+      //           {
+      //             name: "浏览",
+      //             id: "10005"
+      //           },
+      //           {
+      //             name: "新增",
+      //             id: "10007"
+      //           },
+      //           {
+      //             name: "修改",
+      //             id: "10008"
+      //           },
+      //           {
+      //             name: "删除",
+      //             id: "10009"
+      //           }
+      //         ],
+      //         checkedCities: []
+      //       },
+      //       {
+      //         title: "权限管理",
+      //         id: "13",
+      //         list: [
+      //           {
+      //             name: "浏览",
+      //             id: "10010"
+      //           },
+      //           {
+      //             name: "新增",
+      //             id: "10011"
+      //           },
+      //           {
+      //             name: "修改",
+      //             id: "10012"
+      //           },
+      //           {
+      //             name: "删除",
+      //             id: "10013"
+      //           }
+      //         ],
+      //         checkedCities: []
+      //       }
+      //     ]
+      //   },
+      //   {
+      //     title: "服务网关管理",
+      //     id: "2",
+      //     second: [
+      //       {
+      //         title: "网关管理",
+      //         id: "14",
+      //         list: [
+      //           {
+      //             id: "10014",
+      //             name: "浏览"
                   
-                },
-                {
-                  name: "新增",
-                  id: "10015"
-                },
-                {
-                  name: "修改",
-                  id: "10016"
-                },
-                {
-                  name: "删除",
-                  id: "10017"
-                }
-              ],
-              checkedCities: []
-            }
-          ]
-        }
-      ],
+      //           },
+      //           {
+      //             name: "新增",
+      //             id: "10015"
+      //           },
+      //           {
+      //             name: "修改",
+      //             id: "10016"
+      //           },
+      //           {
+      //             name: "删除",
+      //             id: "10017"
+      //           }
+      //         ],
+      //         checkedCities: []
+      //       }
+      //     ]
+      //   }
+      // ],
+      dataList:[],
       permissionData: []
     };
   },
   created() {
+    var that = this
     this.$store.getters.grantPermissionData = this.dataList;
+    // shopMenuTreeData
+    req.get(this.api.shopMenuTreeData,{
+      params:{
+
+      }
+    }).then((resp)=>{
+      if(resp.data.status === 0){
+          console.log(resp.data.data)
+          that.dataList = resp.data.data
+      }
+    }).catch((error) =>{
+      console.log(error)
+    });
   },
   methods: {
     fold: function(item) {

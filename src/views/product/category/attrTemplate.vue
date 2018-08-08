@@ -10,9 +10,9 @@
     <el-col :span="4">
        <el-row :gutter="15">
         <el-col :span="4">
-           <el-button title="删除属性组!" size="small" 
+           <el-button  circle title="删除属性组!" size="small" 
            @click="subAttr(attrTemplateArr,temp,index)" type="danger" 
-           icon="el-icon-delete" circle></el-button>
+           icon="el-icon-delete" ></el-button>
         </el-col>
         <el-col :span="20">
           <el-input
@@ -29,10 +29,10 @@
             placeholder="请输入属性值!" v-model="attr.attrValue" clearable>
             <template slot="prepend">属性名:</template>
           </el-input>
-          <el-button type="danger" title='删除属性值!' icon="el-icon-delete" @click="subAttr(temp.attrArr,attr.attrValue,subIndex)" circle size="mini"></el-button>
+          <el-button type="danger" circle title='删除属性值!' icon="el-icon-delete" @click="subAttr(temp.attrArr,attr.attrValue,subIndex)"  size="mini"></el-button>
           &nbsp;
         </div>
-        <el-button type="primary" title='新增属性值!' @click="addAttr(temp.attrArr)" circle size="mini"><i class="el-icon-plus"></i></el-button>
+        <el-button type="primary" circle title='新增属性值!' @click="addAttr(temp.attrArr)"  size="mini"><i class="el-icon-plus"></i></el-button>
        </div>
     </el-col>
 </el-row>

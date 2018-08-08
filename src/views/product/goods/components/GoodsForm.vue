@@ -135,7 +135,6 @@
                               <i @click="handleRemoveAttr(shopGoods.attrValue,index,attrs.group)" style="color:red;cursor:pointer;" class="el-icon-delete"></i>
                               &nbsp;&nbsp;
                               <div style="display:inline-block;font-weight:bold;">
-                                
                                 <el-popover
                                   placement="top-start"
                                   title="编辑"
@@ -185,10 +184,11 @@
                               </div>
                             </el-col>
                           </el-row>
+                          
                       </div>
                       <div>
-                        <i @click="handleAddAttr(attrs.attrs)" style="color:green;font-size:25px;cursor:pointer;vertical-align:middle" class="el-icon-circle-plus"></i>
-                      </div>
+                          <i @click="handleAddGroupAttr(shopGoods.attrValue)" style="color:green;font-size:25px;cursor:pointer;vertical-align:middle" class="el-icon-circle-plus"></i>
+                        </div>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -502,10 +502,19 @@ export default {
           });          
         });
     },
-    handleAddAttr(attr) { // 添加类目
+    handleAddAttr(attr) { // 新增属性
       attr.push({
         name: '自定义属性',
         value: null
+      })
+    },
+    handleAddGroupAttr(groupAttr){ // 新增属性值
+      groupAttr.push({
+        group: '自定义属性组',
+        attrs:[{
+        name: '自定义属性',
+        value: null
+        }]
       })
     },
     checkAttrValue(name) { // 检查编辑的属性/组 值是否合法
@@ -589,7 +598,7 @@ export default {
       this.goodsImages.push(response.data);
       console.log(this.goodsImages);
     },
-    handleAddGoods() {
+    handleAddGoods() { // 保存商品信息
       var that = this;
       this.$refs["dataForm"].validate(valid => {
         console.log(valid);
@@ -610,7 +619,7 @@ export default {
         }
       });
     },
-    handleUpdateGoods() {
+    handleUpdateGoods() { // 编辑商品信息
       var that = this;
       this.$refs["dataForm"].validate(valid => {
         console.log(valid);

@@ -126,8 +126,8 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form :rules="rules" ref="dataForm" :model="temp" label-position="left" 
       label-width="80px" style='width: auto; margin-left:10px;'>
-          <el-form-item label="系统菜单" prop="name">
-            <el-input type="text"  placeholder="请输入排序!" v-model="temp.name">
+          <el-form-item label="权限名称" prop="name">
+            <el-input type="text"  placeholder="请输入权限名称!" v-model="temp.name">
             </el-input>
           </el-form-item>
           <el-form-item label="排序">
@@ -145,6 +145,24 @@
           </el-form-item>
           <el-form-item label="路径" prop="path">
             <el-input type="text"  placeholder="请输入路径!" v-model="temp.path">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="重定向" prop="redirect">
+            <el-input type="text"  placeholder="请输入路径!" v-model="temp.redirect">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="是否展示" prop="alwaysShow">
+            <el-radio-group v-model="temp.alwaysShow">
+              <el-radio label="是"></el-radio>
+              <el-radio label="否"></el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="组件" prop="component">
+            <el-input type="text"  placeholder="请输入组件名称!" v-model="temp.component">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="元数据" prop="meta">
+            <el-input type="text"  placeholder="请输入元数据!" v-model="temp.meta">
             </el-input>
           </el-form-item>
           <el-form-item label="描述" >
@@ -211,9 +229,9 @@ export default {
         create: '新增'
       },
       rules: {
-        name: [ {required: true, message: '请输入系统菜单!', trigger: 'blur' }],
+        name: [ {required: true, message: '请输入菜单名称!', trigger: 'blur' }],
         path: [ {required: true, message: '请输入路径!', trigger: 'blur' }],
-        level: [ {required: true, message: '请选择菜单级别!', trigger: 'change' }]
+        level: [ {required: true, message: '请选择类目级别!', trigger: 'change' }]
       }
     }
   },

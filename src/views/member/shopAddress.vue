@@ -92,8 +92,8 @@
           }
         })
           .then(function(resp) {
-            that.tableData = resp.data.data
-            that.total = resp.data.count
+            that.tableData = resp.data.data.data
+            that.total = resp.data.data.count
           }).catch(function(error) {
             console.log(error)
           })

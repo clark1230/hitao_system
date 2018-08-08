@@ -114,6 +114,7 @@ export const asyncRouterMap = [
 
   {
     path: '/components',
+    hidden: true,
     component: Layout,
     redirect: 'noredirect',
     name: 'component-demo',
@@ -138,6 +139,7 @@ export const asyncRouterMap = [
   {
     path: '/example',
     component: Layout,
+    hidden: true,
     redirect: '/example/table/complex-table',
     name: 'example',
     meta: {
@@ -212,6 +214,22 @@ export const asyncRouterMap = [
     ]
   },
   {
+    path: '/member',
+    redirect: 'noredirct',
+    alwaysShow: true,
+    component: Layout,
+    name: 'member',
+    meta: {
+      title: 'member',
+      icon: 'form'
+    },
+    children: [
+      { path: 'shopMember', component: _import('member/shopMember'), name: 'shopMember', meta: { title: 'shopMember', noCache: true }},
+      { path: 'shopAddress', component: _import('member/shopAddress'), name: 'shopAddress', meta: { title: 'shopAddress', noCache: true }},
+      { path: 'shopArea', component: _import('member/shopArea'), name: 'shopArea', meta: { title: 'shopArea', noCache: true }}
+    ]
+  },
+  {
     path: '/monitor',
     redirect: 'noredirect',
     alwaysShow: true,
@@ -244,24 +262,7 @@ export const asyncRouterMap = [
       icon: 'form'
     },
     children: [
-      { path: 'member-provider-api', component: _import('api/member-provider-api'), name: 'member-provider-api', meta: { title: 'member-provider-api', noCache: true }},
-      { path: 'product-provider-api', component: _import('api/product-provider-api'), name: 'product-provider-api', meta: { title: 'product-provider-api', noCache: true }},
-      { path: 'system-api', component: _import('api/system-api'), name: 'system-api', meta: { title: 'system-api', noCache: true }}
-    ]
-  },
-  {
-    path: '/member',
-    redirect: 'noredirct',
-    alwaysShow: true,
-    component: Layout,
-    name: 'member',
-    meta: {
-      title: 'member',
-      icon: 'form'
-    },
-    children: [
-      { path: 'shopAddress', component: _import('member/shopAddress'), name: 'shopAddress', meta: { title: 'shopAddress', noCache: true }},
-      { path: 'shopArea', component: _import('member/shopArea'), name: 'shopArea', meta: { title: 'shopArea', noCache: true }}
+      { path: 'gateway-api', component: _import('api/gateway-api'), name: 'gateway-api', meta: { title: 'gateway-api', noCache: true }},
     ]
   },
   {

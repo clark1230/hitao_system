@@ -49,11 +49,13 @@
           <el-button
             size="mini"
             type="primary"
-            @click="handleEdit(scope.$index, scope.row)" title="编辑" icon="el-icon-edit" plain></el-button>
+            @click="handleEdit(scope.$index, scope.row)"
+             title="编辑" icon="el-icon-edit" plain></el-button>
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.$index, scope.row)" title="删除" icon="el-icon-delete" plain></el-button>
+            @click="handleDelete(scope.$index, scope.row)" 
+            title="删除" icon="el-icon-delete" plain></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -66,6 +68,54 @@
       layout="total, sizes, prev, pager, next, jumper" :total="total">
       </el-pagination>
     </div>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <el-form :rules="rules" ref="dataForm" :model="temp" label-position="left" 
+      label-width="80px" style='width: auto; margin-left:10px;'>
+          <el-form-item label=区域名称 prop="areaName">
+            <el-input type="text"  placeholder="请输入区域名称!" v-model="temp.areaName">
+            </el-input>
+          </el-form-item>
+          <el-form-item label=父级区域 prop="areaParentId">
+            <el-select
+                v-model="temp.areaParentId"
+                filterable
+                remote
+                reserve-keyword
+                placeholder="请输入父级区域名称!"
+                :remote-method="querySearchAsync"
+                :loading="loading">
+                <el-option
+                  v-for="item in areaArr"
+                  :key="item.areaId"
+                  :label="item.areaName"
+                  :value="item.areaId">
+                </el-option>
+              </el-select>
+          </el-form-item>
+          <el-form-item label="邮编" prop="postCode">
+            <el-input type="text"  placeholder="请输入邮编!" v-model="temp.postCode">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="排序" prop="areaSort">
+            <el-input type="text"  placeholder="请输入区域排序!" v-model="temp.areaSort">
+            </el-input>
+          </el-form-item>
+          <el-form-item label="地区深度"  prop="areaDeep">
+            <el-select class="filter-item" 
+              v-model="temp.areaDeep" placeholder="请选择区域深度!">
+              <el-option key="1" label="省/直辖市/自治区" :value="1"></el-option>
+              <el-option key="2" label="市级市" :value="2"></el-option>
+              <el-option key="3" label="区/县" :value="3"></el-option>
+            </el-select>
+          </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="handleCancel" plain>{{$t('table.cancel')}}</el-button>
+        <el-button v-if="dialogStatus=='create'" type="primary" @click="createData" plain>{{$t('table.confirm')}}</el-button>
+        <el-button v-else type="primary" @click="updateData" plain>{{$t('table.confirm')}}</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -86,16 +136,41 @@
         searchParam: '',
         searchValue: '',
         options: [{
-          value: 'areaName',
-          label: '区域名称'
-        }, {
-          value: 'postCode',
-          label: '邮编'
-        }]
+          value: '1',
+          label: '省/直辖市/自治区'
+        },{
+          value: '2',
+          label: '市级市'
+        },{
+          value: '3',
+          label: '区/县'
+        }],
+        areaArr:[],
+        dialogFormVisible: false,
+        dialogStatus: '',
+        loading: false,
+        temp: {
+          areaName: null,
+          areaParentId: null,
+          areaSort: null,
+          postCode: null,
+          areaDeep: null
+        },
+        textMap: {
+          update: '修改',
+          create: '新增'
+        },
+        rules: {
+          areaName: [{ required: true, message: '请输入区域名称!', trigger: 'blur' }],
+          areaParentId: [{ required: true, message: '请输入输入父级区域!', trigger: 'blur' }],
+          postCode: [{ required: true, message: '请输入输入邮编!', trigger: 'blur' }],
+          areaDeep: [{ required: true, message: '请选择区域深度!', trigger: 'change' }]
+        }
       }
     },
     created: function(){
       this.handleGetData(this.listQuery.page, this.listQuery.limit)
+      //this.areaArr = this.loadAll();
     },
     methods: {
       handleGetData(page, limit, searchParam, searchValue) {
@@ -109,8 +184,8 @@
           }
         })
           .then(function(resp) {
-            that.tableData = resp.data.data
-            that.total = resp.data.count
+            that.tableData = resp.data.data.data
+            that.total = resp.data.data.count
           }).catch(function(error) {
             console.log(error)
           })
@@ -123,7 +198,7 @@
         this.listQuery.page = val
         this.handleGetData(this.listQuery.page, this.listQuery.limit,this.searchParam,this.searchValue)
       },
-      handleRefresh:function() {
+      handleRefresh() {
         this.searchParam = ''
         this.searchValue = ''
         this.handleGetData(1,15)
@@ -148,8 +223,129 @@
           this.handleGetData(1,20,searchParam,searchValue)
         }
       },
-      handleCreate(){
-        console.log('添加....')
+      querySearchAsync(queryString) { // 远程搜索区域信息
+        var that = this
+        console.log(queryString)
+        if(queryString !== ''){
+          // 异步获取数据
+          this.loading = true;
+          req.get(this.api.findParentShopArea,{
+            params: {
+              areaName: queryString
+            }
+          }).then((resp) => {
+            that.loading = false;
+            that.areaArr = resp.data.data;
+            // resp.data.data.forEach( (ele)=>{
+            //   if(ele.areaDeep === 1){
+            //     areaDeep = '省/直辖市/自治区';
+            //   }else if(ele.areaDeep === 2){
+            //     areaDeep = '市级市';
+            //   }else if(ele.areaDeep === 3){
+            //     areaDeep = '区/县';
+            //   }
+            //   areaArr.push({
+            //     value: ele.areaName+'---'+areaDeep,
+            //     areaId: ele.areaId
+            //   })
+            // })
+            // cb(areaArr);
+          }).catch((error) => {
+            console.log(error)
+          })
+        }
+        // var results = queryString ? areaArr.filter(this.createStateFilter(queryString)) : areaArr;
+        // clearTimeout(this.timeout);
+        // this.timeout = setTimeout(() => {
+        //   cb(results);
+        // }, 8000); // 超时8秒
+      },
+      handleSelect(item) {  // 选择区域信息
+        console.log(item);
+        this.temp.areaParentId = item.areaId;
+      },
+      handleCreate(){ // 打开新增弹层
+        this.dialogFormVisible = true
+        this.dialogStatus = 'create'
+      },
+      handleEdit(index, row) { // 打开编辑弹层
+        var that = this
+       
+        req.get(this.api.findShopArea,{
+          params: {
+            areaId: row.areaId
+          }
+        }).then((resp)=>{
+            if(resp.data.status === 0){
+              this.dialogFormVisible = true
+              this.dialogStatus = 'update'
+              that.temp = resp.data.data
+            }
+        }).catch((error)=>{
+          console.log(error)
+        })
+      },
+      handleCancel() {
+      this.dialogFormVisible = false
+      this.resetTemp()
+      },
+      handleDelete() {
+
+      },
+      createData() { // 保存区域信息
+        var that = this
+        this.$refs['dataForm'].validate((valid) => {
+          console.log(valid)
+          if (valid) {
+            req.post(this.api.saveShopArea, this.temp)
+              .then(function(resp) {
+                if (resp.data.status === 0) {
+                  that.baseNotify('成功',resp.data.msg,'success');
+                  that.dialogFormVisible = false;
+                  that.$refs['dataForm'].resetFields(); // 重置表单
+                  tht.resetTemp()
+                  that.handleRefresh()
+                } else {
+                  that.baseNotify('成功',resp.data.msg,'error');
+                }
+              })
+              .catch(function(error) {
+                console.log(error)
+              })
+          }
+        })
+      },
+      updateData() { // 编辑区域信息
+        var that = this
+        this.$refs['dataForm'].validate((valid) => {
+          console.log(valid)
+          if (valid) {
+            req.post(this.api.updateShopArea, this.temp)
+              .then(function(resp) {
+                if (resp.data.status === 0) {
+                  that.baseNotify('成功',resp.data.msg,'success');
+                  that.dialogFormVisible = false;
+                  that.$refs['dataForm'].resetFields(); // 重置表单
+                  tht.resetTemp()
+                  that.handleRefresh()
+                } else {
+                  that.baseNotify('成功',resp.data.msg,'error');
+                }
+              })
+              .catch(function(error) {
+                console.log(error)
+              })
+          }
+        })
+      },
+      resetTemp() {
+        this.temp = {
+          areaName: null,
+          areaParentId: null,
+          areaSort: null,
+          postCode: null,
+          areaDeep: null
+        }
       }
     }
   }

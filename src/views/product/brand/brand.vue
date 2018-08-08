@@ -14,10 +14,10 @@
     <el-table  @selection-change="handleSelectionChange" :data="brandData"  stripe  border size="mini" style="width: 100%">
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column prop="brandName" label="品牌名称" width="180"></el-table-column>
-      <el-table-column prop="brandClass" label="brandClass" width="180"></el-table-column>
+      <el-table-column prop="brandClass" label="类目名称" width="180"></el-table-column>
       <el-table-column label="图片" width="120">
         <template slot-scope="scope">
-          <img :src="scope.row.brandPic" style="transform:scale(1.3);height:35px;"/>
+          <img :src="scope.row.brandPic !== null ?imageHost+scope.row.brandPic :''" style="transform:scale(1.3);height:35px;"/>
         </template>
       </el-table-column>
       <el-table-column prop="brandSort" label="排序"></el-table-column>
@@ -85,14 +85,16 @@
           </el-form-item>
           <el-form-item label="品牌图片" >
             <el-upload
-              action="https://jsonplaceholder.typicode.com/posts/"
+              :action="uploadHost"
+              :headers="headers"
+              :limit="1"
+              name="pic"
+              :on-success="uploadSuccess"
               list-type="picture-card"
               >
-              <i class="el-icon-plus"></i>
+              <i v-if="dialogStatus==='create'" class="el-icon-plus"></i>
+              <img style="width:148px;height:148px;" :src="imageHost+temp.brandPic"/>
             </el-upload>
-            <!-- <el-dialog :visible.sync="dialogVisible">
-              <img width="100%" :src="dialogImageUrl" alt="">
-            </el-dialog> -->
           </el-form-item>
           <el-form-item label="排序" prop="brandSort">
             <el-input type="text"  placeholder="请输排序编号!" v-model="temp.brandSort">
@@ -109,6 +111,8 @@
 </template>
 <script>
 import req from "@/utils/request";
+import Cookies from 'js-cookie';
+var imageHost = window.g.ImageHost;
 export default {
   data() {
     return {
@@ -116,6 +120,11 @@ export default {
       shopCategoryData: [], // 商品类目信息
       cateArr: [], // 选择类目信息
       brandIdArr:[],
+      uploadHost: null,
+      headers: {
+        token : null
+      },
+      imageHost: imageHost,
       total: 0,
       listQuery: {
         page: 1,
@@ -149,6 +158,8 @@ export default {
     };
   },
   created: function() {
+    this.uploadHost = this.api.uploadShopBrand;
+    this.headers.token = Cookies.get('token');
     this.handleGetData(this.listQuery.page, this.listQuery.limit);
   },
   methods: {
@@ -251,6 +262,15 @@ export default {
     createData() { // 保存新增的品牌信息
       this.commonFormHandler(this.api.saveShopBrand)
     },
+    uploadSuccess(resp,file,fileList){ // 上传品牌图片
+        console.log(resp)
+        if(resp.status ===0) {
+          this.baseNotify('成功','品牌图片上传成功!','success')
+          this.temp.brandPic = resp.data
+        }else{
+          this.baseNotify('失败','品牌图片上传失败!','error')
+        }
+    },
     updateData() { // 保存修改的品牌信息
       this.commonFormHandler(this.api.updateShopBrand)
     },
@@ -277,19 +297,21 @@ export default {
       })
     },
     handleRemove (index,row){ // 逻辑删除用户
-      this.commonDeleteHandler(this.api.removeShopBrand,'brandId',row.brandId)
+    var data = 'brandId=' + row.brandId + '&isDel=' + (row.isDel ===0?1:0)
+      this.commonDeleteHandler(this.api.removeShopBrand,data)
     },
     handleBatchRemove() { // 批量逻辑删除
-      this.commonDeleteHandler(this.api.removeBatchShopBrand,'brandIds',this.brandIdArr)
+      var data = 'brandIds='+this.brandIdArr
+      this.commonDeleteHandler(this.api.removeBatchShopBrand,data)
     },
-    commonDeleteHandler(url,name,value){
+    commonDeleteHandler(url,data){
       var that = this
-      this.$confirm('此操作将禁用所选品牌, 是否继续?', '提示', {
+      this.$confirm('此操作将启用/禁用所选品牌, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          req.delete(url+'?'+name+'='+value).then((resp) => {
+          req.delete(url+'?'+data).then((resp) => {
               if(resp.data.status === 0){
                 that.baseMsg('删除成功!','success')
                 that.handleRefresh()
@@ -300,6 +322,7 @@ export default {
               console.log(error)
             })
         }).catch(() => {
+          this.brandIdArr = []
           this.baseMsg('已取消删除!','info')
         });
     },

@@ -142,23 +142,36 @@
     methods: {
       handleGetData(page, limit) {
         var that = this
-        req.get('authc/shopRole/shopRoleAjax', {
+        req.get(this.api.shopRoleAPI, {
           params: {
             page: page,
             limit: limit
           }
         })
           .then(function(resp) {
-            if(resp.data.code === 0){
-              that.success('数据加载成功!');
-              that.tableData = resp.data.data
-              that.total = resp.data.count
+            if(resp.data.status === 0){
+              that.baseMsg("数据加载成功!",'success');
+              that.tableData = resp.data.data.data
+              that.total = resp.data.data.count
             }else{
-              that.error('数据加载失败!');
+              that.baseMsg("数据加载失败!",'error');
             }
           }).catch(function(error) {
             console.log(error)
           })
+      },handleSizeChange(val) {
+        this.listQuery.limit = val
+        this.handleGetData(this.listQuery.page, this.listQuery.limit)
+      },
+      handleCurrentChange(val) {
+        this.listQuery.page = val
+        this.handleGetData(this.listQuery.page, this.listQuery.limit)
+      },
+      handleSearch: function() {
+
+      },
+      handleRefresh: function() {
+        this.handleGetData(this.listQuery.page,this.listQuery.limit)
       },
       handleDelete(index, row) {
         var that = this
@@ -218,7 +231,7 @@
         var roleId = row.roleId
         var that = this;
         this.dialogStatus = 'update';
-        req.get(that.myConfig.host + 'authc/shopRole/findOne', {
+        req.get(this.api.shopRoleFindOne, {
           params: {
             roleId: roleId
           }
@@ -239,20 +252,6 @@
             console.log(error)
           })
       },
-      handleSizeChange(val) {
-        this.listQuery.limit = val
-        this.handleGetData(this.listQuery.page, this.listQuery.limit)
-      },
-      handleCurrentChange(val) {
-        this.listQuery.page = val
-        this.handleGetData(this.listQuery.page, this.listQuery.limit)
-      },
-      handleSearch: function() {
-
-      },
-      handleRefresh: function() {
-        this.handleGetData(this.listQuery.page,this.listQuery.limit)
-      },
       handleCreate: function() {
         this.resetTemp()
         this.dialogStatus = 'create'
@@ -266,7 +265,7 @@
         this.$refs['dataForm'].validate((valid) => {
           console.log(valid)
           if (valid) {
-            req.post('authc/shopRole/addShopRole', this.temp)
+            req.post(this.api.addShopRole, this.temp)
               .then(function(resp) {
                 if (resp.data.status === 0) {
                   that.success(resp.data.msg)
@@ -285,7 +284,7 @@
         var that = this
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            req.post('authc/shopRole/updateShopRole', that.temp)
+            req.post(this.api.updateShopRole, that.temp)
             .then(function(resp) {
               if (resp.data.status === 0) {
                 that.success(resp.data.msg)

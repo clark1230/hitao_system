@@ -72,8 +72,9 @@ const user = {
             reject('error')
           }
           const data = response.data
+          
           setPersmissions(data.data.permissions)
-          console.log('权限:' + data.data.permissions)
+          // console.log('权限:' + data.data.permissions)
           commit('SET_ROLES', data.data.roles)
           commit('SET_NAME', data.data.shopAdmin.adminName)
           commit('SET_AVATAR', 'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=925993276,4023638545&fm=27&gp=0.jpg')

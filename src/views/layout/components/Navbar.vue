@@ -28,9 +28,9 @@
               {{$t('navbar.dashboard')}}
             </el-dropdown-item>
           </router-link>
-          <a target='_blank' href="https://github.com/PanJiaChen/vue-element-admin/">
+          <a @click="changeInfo" href="javascript:void;">
             <el-dropdown-item>
-              {{$t('navbar.github')}}
+              个人信息
             </el-dropdown-item>
           </a>
           <el-dropdown-item divided>
@@ -38,6 +38,18 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
+    </div>
+    <div>
+      <el-dialog title="编辑" :visible.sync="dialogFormVisible">
+      <el-form  ref="dataForm"  label-position="left" 
+      label-width="80px" style='width: auto; margin-left:10px;'>
+          tyrytyy
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="handleCancel" plain>{{$t('table.cancel')}}</el-button>
+        <el-button  type="primary"  plain>{{$t('table.confirm')}}</el-button>
+      </div>
+    </el-dialog>
     </div>
   </el-menu>
 </template>
@@ -60,6 +72,11 @@ export default {
     LangSelect,
     ThemePicker
   },
+  data() {
+    return {
+      dialogFormVisible: false
+    }
+  }, 
   computed: {
     ...mapGetters([
       'sidebar',
@@ -72,9 +89,25 @@ export default {
       this.$store.dispatch('toggleSideBar')
     },
     logout() {
-      this.$store.dispatch('LogOut').then(() => {
-        location.reload()// In order to re-instantiate the vue-router object to avoid bugs
-      })
+      this.$confirm('即将退出系统, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$store.dispatch('LogOut').then(() => {
+            location.reload()// In order to re-instantiate the vue-router object to avoid bugs
+          })
+        }).catch(() => {
+          this.baseMsg('已取消!')
+        });
+      
+    },
+    changeInfo() {
+      // 编辑个人信息
+      this.dialogFormVisible = true
+    },
+    handleCancel() {
+      this.dialogFormVisible = false
     }
   }
 }

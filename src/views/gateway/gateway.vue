@@ -8,9 +8,9 @@
           <el-input  placeholder="请输入搜索值!"></el-input>
         </el-form-item>
       </el-form>
-      <el-button  style="display:inline-block;" :loading="isSearchRefresh" type="primary"  icon="el-icon-search">搜索</el-button>
+      <el-button  style="display:inline-block;" :loading="btnRefresh.isSearchRefresh" type="primary"  icon="el-icon-search">搜索</el-button>
       <el-button @click="handleRefresh" icon="el-icon-refresh">刷新</el-button>
-      <el-button type="primary" @click="handleGatewayRefresh" :loading="isRefreshRoute" icon="el-icon-refresh">刷新路由</el-button>
+      <el-button type="primary" @click="handleGatewayRefresh" :loading="btnRefresh.isRefreshRoute" icon="el-icon-refresh">刷新路由</el-button>
     </div>
     <el-table
       :data="tableData"
@@ -36,7 +36,7 @@
           <span>{{scope.row.retryable}}</span>
         </template>
       </el-table-column>
-      <el-table-column  label="是否启用">
+      <el-table-column  label="是否禁用">
         <template slot-scope="scope">
           <span>{{scope.row.enabled}}</span>
         </template>
@@ -234,7 +234,7 @@
         })
           .then(function(resp) {
            if(resp.data.status === 0){
-              that.successNotify('成功','操作成功!','success');
+              that.baseNotify('成功','操作成功!','success');
               that.handleGetData(that.listQuery.page, that.listQuery.limit)
             }else{
               that.baseNotify('失败','操作失败!','error');
