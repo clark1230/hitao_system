@@ -13,6 +13,7 @@
       <el-button @click="handleRefresh" icon="el-icon-refresh">刷新</el-button>
     </div>
     <el-table
+      @selection-change="handleSelectionChange"
       :data="tableData"
       stripe
       border
@@ -93,10 +94,10 @@
 
     <el-dialog width="70%" top="5vh" :append-to-body="true" :center="true" title="角色授权" :visible.sync="dialogRoleVisible">
       <div style="height:550px;overflow:auto;">
-        <grant-permission :is-edit='false'></grant-permission>
+        <grant-permission ref="grantPermission" :is-edit='false'></grant-permission>
       </div>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogRoleVisible = false" plain>{{$t('table.cancel')}}</el-button>
+        <el-button @click="cancelGrantPermission" plain>{{$t('table.cancel')}}</el-button>
         <el-button type="primary" @click="handleGrantPermission" plain>确定</el-button>
       </div>
     </el-dialog>
@@ -111,6 +112,9 @@
     data() {
       return {
         tableData: [],
+        dataList: [],
+        permissionIdArr: [], //权限编号数组
+        roleIdArr: [], // 角色编号数组
         total: 0,
         listQuery: {
           page: 1,
@@ -159,7 +163,8 @@
           }).catch(function(error) {
             console.log(error)
           })
-      },handleSizeChange(val) {
+      },
+      handleSizeChange(val) {
         this.listQuery.limit = val
         this.handleGetData(this.listQuery.page, this.listQuery.limit)
       },
@@ -167,10 +172,10 @@
         this.listQuery.page = val
         this.handleGetData(this.listQuery.page, this.listQuery.limit)
       },
-      handleSearch: function() {
+      handleSearch: function() { // 搜索角色信息
 
       },
-      handleRefresh: function() {
+      handleRefresh: function() { // 刷新数据
         this.handleGetData(this.listQuery.page,this.listQuery.limit)
       },
       handleDelete(index, row) {
@@ -204,29 +209,53 @@
         });
       },
       showGrantPermission(){ // 为角色授予权限
-        this.dialogRoleVisible = true
-        //this.router.push('grantPermission')
-      },
-      handleGrantPermission() {
-        console.log(this.$store.getters.grantPermissionData)
-        var permissionData = this.$store.getters.grantPermissionData
-        // if(permissionData.length > 0){
-
-        // }else{
-        //   this.baseMsg('请选择要授权的数据?','error')
-        // }
-        var data = [];
-        permissionData.forEach((ele) => {
-          console.log(typeof ele.second.isIndeterminate)
-          if(ele.isIndeterminate || ele.firstCheckAll){
-            data.push(ele)
-          }
-        })
-        console.log(data)
-        if(data.length == 0){
-          this.baseMsg('请选择要授权的数据?','error')
+        // 判断是否选择了角色信息
+        if(this.roleIdArr.length ==0){
+          this.baseMsg('请选择要授权的角色!','error')
+        }else if(this.roleIdArr.length > 1){
+          this.baseMsg('所选数据大于一条!','error')
+        }else{
+            this.dialogRoleVisible = true
         }
       },
+      handleGrantPermission() {
+        var that =  this
+        // 数组深拷贝
+        var dataList = this.$refs.grantPermission.dataList
+        this.dataList = dataList.slice(dataList.length);
+        that.permissionIdArr = [];
+        dataList.forEach((ele) => {
+          ele.children.forEach((subEle) => {
+            if(subEle.checkedCities !== undefined){
+              that.permissionIdArr=that.permissionIdArr.concat(subEle.checkedCities)
+            }
+          })
+        });
+        console.log("权限编号:"+this.permissionIdArr)
+        req.get(this.api.shopRoneGrantPermission+'?roleId='+this.roleIdArr[0]+'&permissionIds='+this.permissionIdArr).then((resp) =>{
+          if(resp.data.status === 0){
+            that.baseNotify('成功',resp.data.msg,'success');
+            that.baseNotify = false;
+            that.permissionIdArr = [];
+            that.roleIdArr = [];
+          }else {
+            that.baseNotify('失败',resp.data.msg,'error');
+          }
+        }).catch((error) =>{
+          console.log(error);
+        })
+      },
+      cancelGrantPermission() { // 取消授权
+        this.permissionIdArr = [];
+        this.dialogRoleVisible = false;
+      },
+      handleSelectionChange(val) {
+        var that = this
+        that.roleIdArr = []
+        val.forEach((ele) => {
+          that.roleIdArr.push(ele.roleId)
+        })
+     },
       handleEdit(index, row) {
         var roleId = row.roleId
         var that = this;

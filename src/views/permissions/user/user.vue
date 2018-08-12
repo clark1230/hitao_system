@@ -6,7 +6,7 @@
       <el-button @click="handleGrantRole" type="primary">授予角色</el-button>
       <el-form  class="demo-form-inline" ref="form" style="display:inline-block;" label-width="10px">
         <el-form-item >
-          <el-input  placeholder="请输入搜索值!"></el-input>
+          <el-input v-model="searchValue"  placeholder="请输入搜索值!"></el-input>
         </el-form-item>
       </el-form>
       <el-button @click="handleSearch" style="display:inline-block;" type="primary"  icon="el-icon-search">搜索</el-button>
@@ -141,6 +141,7 @@ export default {
         type: undefined,
         sort: '+id'
       },
+      searchValue: null, // 搜索值
       adminIdArr:[], // 管理员编号数组
       roleData:[], // 角色信息
       roleIdArr:[], // 角色编号数组
@@ -173,13 +174,19 @@ export default {
     this.handleGetData(this.listQuery.page, this.listQuery.limit)
   },
   methods: {
-    handleGetData(page, limit) { // 获取管理员数据
-      var that = this
-      req.get(that.api.shopAdminAPI, {
-        params: {
+    handleGetData(page, limit,value=null) { // 获取管理员数据
+      var params = value === null ? {
           page: page,
           limit: limit
-        }
+        } :
+        {
+          page: page,
+          limit: limit,
+          adminName: value
+        };
+      var that = this
+      req.get(that.api.shopAdminAPI, {
+        params: params
       })
       .then(function(resp) {
         if(resp.data.status === 0){
@@ -237,7 +244,7 @@ export default {
     },
     handleSizeChange(val) {
         this.listQuery.limit = val
-        //this.handleGetData(this.listQuery.page, this.listQuery.limit)
+        this.handleGetData(this.listQuery.page, this.listQuery.limit)
     },
     resetTemp(){  // 重置表单数据
       this.temp = {
@@ -249,7 +256,7 @@ export default {
     },
     handleCurrentChange(val) {
       this.listQuery.page = val
-      //this.handleGetData(this.listQuery.page, this.listQuery.limit)
+      this.handleGetData(this.listQuery.page, this.listQuery.limit)
     },
     handleEdit(index,row){ // 编辑系统用户信息
       var that = this;
@@ -292,7 +299,6 @@ export default {
     handleBatchRemove() {
       var that = this;
       var data = 'adminIds='+this.adminIdArr
-      console.log(this.adminIdArr)
       this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -313,8 +319,13 @@ export default {
           this.baseMsg('已取消删除')
         });
     },
-    handleSearch(){
-
+    handleSearch(){  // 搜索用户信息
+      var searchValue = this.searchValue;
+      if(searchValue === '' || searchValue === null){
+        this.baseMsg('请输入搜索值!','error');
+        return false;
+      }
+      this.handleGetData(1,this.listQuery.limit,searchValue);
     },
     handleSelectionChange(val) {
       var that = this

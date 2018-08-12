@@ -206,10 +206,10 @@
           <el-col>
             <el-form-item label-width="90px" label="商品图片:" class="postInfo-container-item">
               <el-upload
-                action="http://localhost:8096/fileupload/uploadShopGoodsImage"
+                :action="uploadHost"
                 list-type="picture-card"
                 :multiple="true"
-                :headers="{'token':123}"
+                :headers="headers"
                 :limit="8"
                 :on-exceed="hanleExced"
                 :on-success="handleShopGoodsSuccess"
@@ -267,6 +267,9 @@ import Sticky from "@/components/Sticky"; // 粘性header组件
 import { validateURL } from "@/utils/validate";
 import { userSearch } from "@/api/remoteSearch";
 import req from "@/utils/request";
+import Cookies from 'js-cookie';
+
+var imageHost = window.g.ImageHost;
 export default {
   name: "GoodsFormDetail",
   components: { Tinymce, MDinput, Upload, Multiselect, Sticky },
@@ -278,11 +281,15 @@ export default {
   },
   data() {
     return {
+       headers: {
+        token : null
+      },
       active: 0,
       isShowForm: false, // 是否展示表单
       isChecked: false, // 是否勾选
       isShowTooltip : false, // 是否展示属性/组编辑
       fetchSuccess: true,
+      uploadHost: null,
       checked: false,
       loading: false, // 正在加载
       radio: "1",
@@ -305,6 +312,7 @@ export default {
         goodsCommand: "0",
         mainImage: "", // 商品主图
         content: "", // 商品内容
+        goodsImages:[], // 商品图片
         attrValue: [] // 商品规格属性
       },
       goodsImages: [], // 商品图片
@@ -339,6 +347,8 @@ export default {
   },
   created() {
     var that = this;
+    this.headers.token = Cookies.get('token');
+    that.uploadHost = that.api.uploadShopGoods
     req
       .get(this.api.catetoryFindByPId, {
         params: {
@@ -586,6 +596,7 @@ export default {
       this.error("只能上传一张商品主图!");
     },
     handleSuccess(response, file, fileList) {
+      this.shopGoods.goodsImages.push(response.data);
       this.shopGoods.mainImage = response.data;
     },
     handleError(err, file, fileList) {

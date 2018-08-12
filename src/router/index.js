@@ -54,34 +54,34 @@ export default new Router({
 })
 
 // 计算表达式的值
-function evil(fn) { // 替代eval函数，ESLint语法检查规则问题!
-  var Fn = Function // 一个变量指向Function，防止有些前端编译工具报错
-  return new Fn('return ' + fn)()
-}
-var permissions = getPermissions()
-permissions = (permissions !== undefined ? eval( '(' + permissions + ')') : [])
-var routerArr = []
+// function evil(fn) { // 替代eval函数，ESLint语法检查规则问题!
+//   var Fn = Function // 一个变量指向Function，防止有些前端编译工具报错
+//   return new Fn('return ' + fn)()
+// }
+// var permissions = getPermissions()
+// permissions = (permissions !== undefined ? eval( '(' + permissions + ')') : [])
+// var routerArr = []
 
 // 遍历后台权限信息,组装成动态路由信息
-permissions.forEach(per => {
-  per.children.forEach((ele) => {
-    var meta = JSON.parse(per.meta)
-    ele.component = _import(per.component) // 加载页面组件
-    ele.meta = {
-      title: meta.title, // 菜单标题
-      noCache: meta.noCache // 是否缓存页面
-    }
-  })
-  var router = {
-    path: per.path,
-    alwaysShow: true,
-    component: Layout,
-    name: per.name,
-    meta: JSON.parse(per.meta),
-    children: per.children
-  }
-  routerArr.push(router)
-})
+// permissions.forEach(per => {
+//   per.children.forEach((ele) => {
+//     var meta = JSON.parse(per.meta)
+//     ele.component = _import(per.component) // 加载页面组件
+//     ele.meta = {
+//       title: meta.title, // 菜单标题
+//       noCache: meta.noCache // 是否缓存页面
+//     }
+//   })
+//   var router = {
+//     path: per.path,
+//     alwaysShow: true,
+//     component: Layout,
+//     name: per.name,
+//     meta: JSON.parse(per.meta),
+//     children: per.children
+//   }
+//   routerArr.push(router)
+// })
 // 动态路由
 export const asyncRouterMap = [
   // {
@@ -294,20 +294,6 @@ export const asyncRouterMap = [
     ]
   },
   {
-    path: '/article',
-    redirct: 'nodirect',
-    alwaysShow: true,
-    component: Layout,
-    name: 'article',
-    meta: {
-      title: 'article',
-      icon: 'form'
-    },
-    children: [
-      { path: 'article', component: _import('article/article'), name: 'article', meta: { title: 'article', noCache: true }}
-    ]
-  },
-  {
     path: '/market',
     redirct: 'nodirect',
     alwaysShow: true,
@@ -319,8 +305,9 @@ export const asyncRouterMap = [
     },
     children: [
       { path: 'market', component: _import('market/coupon'), name: 'coupon', meta: { title: 'coupon', noCache: true }},
+      { path: 'article', component: _import('article/article'), name: 'article', meta: { title: 'article', noCache: true }},
+      { path: 'articleClass', component: _import('market/articleClass'), name: 'articleClass', meta: { title: 'articleClass', noCache: true }},
       { path: 'adv', component: _import('market/adv'), name: 'adv', meta: { title: 'adv', noCache: true }}
     ]
-  },
-  routerArr[0]
+  }
 ]

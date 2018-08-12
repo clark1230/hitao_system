@@ -93,7 +93,7 @@
               list-type="picture-card"
               >
               <i v-if="dialogStatus==='create'" class="el-icon-plus"></i>
-              <img style="width:148px;height:148px;" :src="imageHost+temp.brandPic"/>
+              <img v-if="dialogStatus==='update'" style="width:148px;height:148px;" :src="imageHost+temp.brandPic"/>
             </el-upload>
           </el-form-item>
           <el-form-item label="排序" prop="brandSort">

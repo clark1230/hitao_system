@@ -1,5 +1,18 @@
 <template>
   <div>
-    数据库连接池
+     <iframe :src="host" width="100%" height="850px" 
+       frameborder="0"></iframe>
   </div>  
 </template>
+<script>
+export default {
+  data() {
+    return {
+      host: null
+    }
+  },
+  created() {
+    this.host = this.api.druidMonitor
+  },
+}
+</script>

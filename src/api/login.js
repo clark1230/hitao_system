@@ -1,12 +1,12 @@
 import request from '@/utils/request'
-
+var api = window.g.api
 export function loginByUsername(adminName, adminPassword) {
   const data = {
     adminName,
     adminPassword
   }
   return request({
-    url: '/authc/account/login',
+    url: api.loginAPI,
     method: 'post',
     data
   })
@@ -14,14 +14,14 @@ export function loginByUsername(adminName, adminPassword) {
 
 export function logout() {
   return request({
-    url: '/authc/account/logout',
+    url: api.logoutAPI,
     method: 'get'
   })
 }
 
 export function getUserInfo(token) {
   return request({
-    url: '/authc/shopAdmin/info',
+    url: api.shopAdminInfo,
     method: 'get'
   })
 }

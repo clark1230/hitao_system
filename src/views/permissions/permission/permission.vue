@@ -45,6 +45,15 @@
         </el-tree>
       </el-col>
       <el-col :span="19">
+         <div class="pagination-container">
+            <el-pagination background @size-change="handleSizeChange" 
+                @current-change="handleCurrentChange" 
+                :current-page="listQuery.page" 
+                :page-sizes="[10,15,30, 50]" 
+                :page-size="listQuery.limit" 
+                layout="total, sizes, prev, pager, next, jumper" :total="total">
+            </el-pagination>
+        </div>
         <el-table :data="tableData"
             stripe
             border
@@ -153,8 +162,8 @@
           </el-form-item>
           <el-form-item label="是否展示" prop="alwaysShow">
             <el-radio-group v-model="temp.alwaysShow">
-              <el-radio label="是"></el-radio>
-              <el-radio label="否"></el-radio>
+              <el-radio label="0">是</el-radio>
+              <el-radio label="否">否</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="组件" prop="component">

@@ -80,6 +80,7 @@ export default {
     settings: '系统设置',
     adv: '广告管理',
     article: '文章管理',
+    articleClass: '文章分类管理',
     market: '营销管理',
     coupon: '优惠券'
   },

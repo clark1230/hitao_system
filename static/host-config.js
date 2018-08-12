@@ -1,5 +1,5 @@
-var host = 'http://192.168.3.146:8200/'
-var imageHost = 'http://192.168.3.146:8096/'
+var host = 'http://localhost:8200/' // 网关地址
+var imageHost = 'http://localhost:8096/' // 图片访问地址
 window.g = {
   AXIOS_TIMEOUT: 10000, // 配置网络超时
   ApiUrl: host, // 配置服务器地址,
@@ -7,7 +7,7 @@ window.g = {
   api: {
     // 系统账号
     loginAPI: host + 'authc/account/login', // 系统登陆接口
-    logoutAPI: host + ' authc/account/logout', // 系统注销接口
+    logoutAPI: host + 'authc/account/logout', // 系统注销接口
 
     // 网关接口
     gatewayAPI: host + 'system/gatewayApiDefine/gatewayApiDefineAjax', // 网关接口
@@ -25,9 +25,11 @@ window.g = {
     addShopRole: host + 'authc/shopRole/save',
     updateShopRole: host + 'authc/shopRole/update',
     findAllShopRole: host + 'authc/shopRole/findAll', // 查询系统角色信息接口
+    shopRoneGrantPermission: host + 'authc/shopRole/grantPermission', // 授予权限
 
     // 系统用户接口
     shopAdminAPI: host + 'authc/shopAdmin/showData', // 获取管理员分页数据
+    shopAdminInfo: host + 'authc/shopAdmin/info', // 获取管理员信息解决(基本上数据，权限，角色等)
     addShopAdmin: host + 'authc/shopAdmin/save', // 添加系统用户接口
     shopAdminFindOne: host + 'authc/shopAdmin/findOne', // 查找系统用户接口
     editShopAdmin: host + 'authc/shopAdmin/update', // 编辑系统用户接口
@@ -51,6 +53,7 @@ window.g = {
     saveShopGoods: host + 'system/shopGoods/save', // 保存商品信息接口
     findShopGoods: host + 'system/shopGoods/findOne', // 查询商品信息接口
     updateShopGoods: host + 'system/shopGoods/update', // 编辑商品接口
+    uploadShopGoods: host + 'fileupload/shopGoods/uploadShopGoodsImage', // 上传商品图片接口
 
     // 品牌接口
     shopBrandAPI: host + 'system/shopBrand/shopBrandAjax', // 品牌列表接口
@@ -64,7 +67,7 @@ window.g = {
 
     // 类目接口
     shopGoodsCategoryAPI: host + 'system/shopGoodsCategory/shopGoodsCategoryAjax',
-    shopGoodsCategory: host + 'system/shopGoodsCategory/treeData',
+    // shopGoodsCategory: host + 'system/shopGoodsCategory/treeData',
     shopGoodsTreeData: host + 'system/shopGoodsCategory/treeData',
     catetoryFindByPId: host + 'system/shopGoodsCategory/findByPId',
     removeShopCategory: host + 'system/shopGoodsCategory/remove',
@@ -93,6 +96,17 @@ window.g = {
     saveShopArea: host + 'system/shopArea/save', // 保存区域信息接口
     findParentShopArea: host + 'system/shopArea/findShopArea', // 根据区域名称查询区域信息接口
     findShopArea: host + 'system/shopArea/findOne', // 根据id查询区域信息接口
-    updateShopArea: host + 'system/shopArea/update' // 编辑区域信息接口
+    updateShopArea: host + 'system/shopArea/update', // 编辑区域信息接口
+
+    // 系统监控
+    druidMonitor: 'http://localhost:8140/druid/index.html',
+
+    // 营销接口
+    articleClassAPI: host + 'system/shopArticleClass/showData',
+    saveArticleClass: host + 'system/shopArticleClass/save', // 保存文章分类
+    findArticleClass: host + 'system/shopArticleClass/findOne', // 根据编号查询文章分类信息
+    updateArticleClass: host + 'system/shopArticleClass/update', // 编辑文章分类
+    removeArticleClass: host + 'system/shopArticleClass/remove', // 物理删除文章分类
+    removeBatchArticleClass: host + 'system/shopArticleClass/removeBatch' // 物理批量删除文章分类
   }
 }

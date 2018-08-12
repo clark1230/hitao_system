@@ -9,31 +9,34 @@
     <li  v-for="(item, index) in dataList" :key="item.id">
         <div class="left h40"  @click="fold(item)">
             <i :class="{'el-icon-caret-right':item.folded,'el-icon-caret-bottom':!item.folded}"
-               v-cloak v-if="item.second"
+               v-cloak v-if="item.children"
                class="item-icon"></i>
-            <el-checkbox @click.native="handleOneCheckAll($event,item)" v-cloak v-if="!item.second" :indeterminate="item.isIndeterminate" v-model="item.checkAll"> {{item.title}}</el-checkbox>
-            <span v-if="item.second" v-cloak>{{item.title}}</span>
+            <el-checkbox @click.native="handleOneCheckAll($event,item)" v-cloak v-if="!item.children" :indeterminate="item.isIndeterminate" v-model="item.checkAll"> {{item.name}}</el-checkbox>
+            <span v-if="item.children" v-cloak>{{item.name}}</span>
         </div>
         <div class="right h40">
-            <el-checkbox v-if="item.second" :indeterminate="item.isIndeterminate" 
+          <!--三级权限-->
+            <el-checkbox v-if="item.children" :indeterminate="item.isIndeterminate" 
             @change="checkSecondAll(item)" v-model="item.firstCheckAll"> 所有</el-checkbox>
+            <!--展示二级权限-->
             <el-checkbox-group v-model="item.checkedCities" @change="handleOneCheckedCitiesChange(item)" v-else>
-                 <el-checkbox  v-for="m in item.list" :label="m.id" :key="m.id" v-cloak>
+                 <el-checkbox  v-for="m in item.children" :label="m.id" :key="m.id" v-cloak>
                       {{m.name}}
                  </el-checkbox>
             </el-checkbox-group>
         </div>
         <div class="line"></div>
-        <ul v-show="item.second&&!item.folded">
-            <li class="h40" v-for="(second,cur) in item.second" :key="second.id">
+        <!--展示三级权限信息-->
+        <ul v-show="item.children.length&& !item.folded">
+            <li class="h40" v-for="(children,cur) in item.children" :key="children.id">
                 <div class="left">
-                    <el-checkbox :indeterminate="second.isIndeterminate"  v-model="second.checkAll" @change="handleCheckAllChange($event,item,second)" v-cloak>
-                        {{second.title}}
+                    <el-checkbox :indeterminate="children.isIndeterminate"  v-model="children.checkAll" @change="handleCheckAllChange($event,item,children)" v-cloak>
+                        {{children.name}}
                     </el-checkbox>
                 </div>
                 <div class="right">
-                    <el-checkbox-group v-model="second.checkedCities"  @change="handleCheckedCitiesChange($event,item,second)">
-                        <el-checkbox  v-for="p in second.list" :label="p.id" :key="p.id" v-cloak >
+                    <el-checkbox-group v-model="children.checkedCities"  @change="handleCheckedCitiesChange($event,item,children)">
+                        <el-checkbox  v-for="p in children.children" :label="p.id" :key="p.id" v-cloak >
                             {{p.name}}
                     </el-checkbox>
                     </el-checkbox-group>
@@ -54,11 +57,11 @@ export default {
       //   {
       //     title: "权限管理",
       //     id: "1",
-      //     second: [
+      //     children: [
       //       {
       //         title: "用户管理",
       //         id: "11",
-      //         list: [
+      //         children: [
       //           {
       //             id: "10003",
       //             name: "浏览"
@@ -77,7 +80,7 @@ export default {
       //       {
       //         title: "角色管理",
       //         id: "12",
-      //         list: [
+      //         children: [
       //           {
       //             name: "浏览",
       //             id: "10005"
@@ -100,7 +103,7 @@ export default {
       //       {
       //         title: "权限管理",
       //         id: "13",
-      //         list: [
+      //         children: [
       //           {
       //             name: "浏览",
       //             id: "10010"
@@ -125,11 +128,11 @@ export default {
       //   {
       //     title: "服务网关管理",
       //     id: "2",
-      //     second: [
+      //     children: [
       //       {
       //         title: "网关管理",
       //         id: "14",
-      //         list: [
+      //         children: [
       //           {
       //             id: "10014",
       //             name: "浏览"
@@ -167,8 +170,7 @@ export default {
       }
     }).then((resp)=>{
       if(resp.data.status === 0){
-          console.log(resp.data.data)
-          that.dataList = resp.data.data
+          that.dataList = resp.data.data[0].children
       }
     }).catch((error) =>{
       console.log(error)
@@ -184,12 +186,13 @@ export default {
       }
     },
     // 全选一项
-    handleCheckAllChange(checked, item, second) {
-      if (typeof second.checkedCities === "undefined") {
-        this.$set(second, "checkedCities", []);
+    handleCheckAllChange(checked, item, children) {
+      console.log('全选:'+checked)
+      if (typeof children.checkedCities === "undefined") {
+        this.$set(children, "checkedCities", []);
       }
-      if (typeof second.list !== "undefined") {
-        this.$set(second, "checked", false);
+      if (typeof children.children !== "undefined") {
+        this.$set(children, "checked", false);
       }
       if (typeof item.isIndeterminate === "undefined") {
         this.$set(item, "isIndeterminate", false);
@@ -197,12 +200,12 @@ export default {
       if (checked) {
         // 说明勾选了
         var checkedNum = 0;
-        item.second.forEach(ele => {
+        item.children.forEach(ele => {
           if (ele.checkAll) {
             checkedNum++;
           }
         });
-        if (checkedNum === item.second.length) {
+        if (checkedNum === item.children.length) {
           item.firstCheckAll = true;
           item.isIndeterminate = false;
         } else {
@@ -211,12 +214,12 @@ export default {
         }
       } else {
         var unCheckedNum = 0;
-        item.second.forEach(ele => {
+        item.children.forEach(ele => {
           if (!ele.checkAll) {
             unCheckedNum++;
           }
         });
-        if (unCheckedNum === item.second.length) {
+        if (unCheckedNum === item.children.length) {
           console.log("全部取消");
           item.firstCheckAll = false;
           item.isIndeterminate = false;
@@ -225,42 +228,49 @@ export default {
           item.isIndeterminate = true;
         }
       }
-      if (second.checkAll) {
-        second.isIndeterminate = false;
-        second.list.forEach(ele => {
-          second.checkedCities.push(ele.id);
+      if (children.checkAll) {
+        children.isIndeterminate = false;
+        children.children.forEach(ele => {
+          children.checkedCities.push(ele.id);
         });
       } else {
-        second.checkedCities = [];
-        second.isIndeterminate = false;
+        children.checkedCities = [];
+        children.isIndeterminate = false;
       }
-      second.checkedAll = second.checkedAll === true ? false : true;
+      children.checkedAll = children.checkedAll === true ? false : true;
     },
     // 单选
-    handleCheckedCitiesChange(checkedArr, item, second) {
-      second.checkedCities = checkedArr;
-      let checkedCount = second.checkedCities.length;
-      if (typeof second.checkAll === "undefined") {
-        this.$set(second, "checkAll", false);
+    handleCheckedCitiesChange(checkedArr, item, children) {
+      console.log('单选：'+checkedArr)
+      console.log(item)
+      console.log(children)
+      //children.checkedCities = [];
+      let checkedCount = 0;//children.checkedCities.length;
+      if (typeof children.checkAll === "undefined") {
+        this.$set(children, "checkAll", false);
       }
-      if (typeof second.isIndeterminate === "undefined") {
-        this.$set(second, "isIndeterminate", false);
+      if (typeof children.checkedCities === "undefined") {
+        this.$set(children, "checkedCities", []);
+      }
+      if (typeof children.isIndeterminate === "undefined") {
+        this.$set(children, "isIndeterminate", false);
       }
       if (typeof item.isIndeterminate === "undefined") {
         this.$set(item, "isIndeterminate", false);
       }
-      second.checkAll = checkedCount === second.list.length;
-      second.isIndeterminate =
-        checkedCount > 0 && checkedCount < second.list.length;
+      children.checkAll = checkedCount === children.children.length;
+      children.isIndeterminate =
+        checkedCount > 0 && checkedCount < children.children.length;
       if (item.checkedAll) {
         item.isIndeterminate = false;
         item.checkedAll = true;
       } else {
-        for (let a = 0; a < item.second.length; a++) {
-          if (!item.second[a].checkAll) {
+        for (let a = 0; a < item.children.length; a++) {
+          if (!item.children[a].checkAll) {
             item.isIndeterminate = true;
-            for (let b = 0; b < item.second.length; b++) {
-              if (item.second[b].checkedCities.length > 0) {
+            for (let b = 0; b < item.children.length; b++) {
+              console.log('eee:'+item.children[b].checkedCities)
+              if (item.children[b].checkedCities.length > 0) {
                 item.isIndeterminate = true;
                 item.checkedAll = false;
                 break;
@@ -282,16 +292,16 @@ export default {
       if (typeof item.firstCheckAll === "undefined") {
         this.$set(item, "firstCheckAll", false);
       }
-      for (let a = 0; a < item.second.length; a++) {
-        this.checkItemAll(item.firstCheckAll, item.second[a]);
+      for (let a = 0; a < item.children.length; a++) {
+        this.checkItemAll(item.firstCheckAll, item.children[a]);
       }
       item.isIndeterminate = false;
     },
     checkItemAll: function(flag, item) {
       let arr = [];
       console.log(item)
-      for (let a = 0; a < item.list.length; a++) {
-        arr.push(item.list[a].id);
+      for (let a = 0; a < item.children.length; a++) {
+        arr.push(item.children[a].id);
       }
       if (typeof item.checkedCities === "undefined") {
         this.$set(item, "checkedCities", arr);
@@ -310,22 +320,22 @@ export default {
       if (typeof item.checkAll === "undefined") {
         this.$set(item, "checkAll", false);
       }
-      item.isIndeterminate = checkedCount > 0 && checkedCount < item.list.length;
-      item.checkAll = checkedCount === item.list.length;
+      item.isIndeterminate = checkedCount > 0 && checkedCount < item.children.length;
+      item.checkAll = checkedCount === item.children.length;
       // 修改同级权限信息
       this.dataList.forEach((ele) => {
-          if(ele.second !== undefined && ele.second.length >0){
+          if(ele.children !== undefined && ele.children.length >0){
               if(ele.firstCheckAll === 'undefined'){
                   this.$set(ele, "firstCheckAll", false);
               }
               ele.isIndeterminate = true
               ele.checkAll = false
-              ele.second.forEach((subEle) => {
+              ele.children.forEach((subEle) => {
                   if (typeof subEle.isIndeterminate === "undefined") {
                     this.$set(subEle, "isIndeterminate", false);
                 }
                   subEle.isIndeterminate = true
-                //   subEle.list.forEach( (list) => {
+                //   subEle.children.forEach( (children) => {
                     
                 //   })
                 subEle.checkedCities = []
@@ -337,11 +347,11 @@ export default {
     handleOneCheckAll: function(event, item) {
       var that = this
       let arr = [];
-      for (let a = 0; a < item.list.length; a++) {
-        arr.push(item.list[a].id);
+      for (let a = 0; a < item.children.length; a++) {
+        arr.push(item.children[a].id);
       }
       item.checkedCities = event.target.checked ? arr : [];
-      if(item.checkedCities.length = item.list.length){
+      if(item.checkedCities.length = item.children.length){
           item.checkAll = true;
           item.isIndeterminate = false;
       }else{
@@ -351,7 +361,7 @@ export default {
       // 把一下所有的数据的都遍历勾选
       if(event.target.checked){
         this.dataList.forEach((ele) => {
-          if(ele.second !== undefined && ele.second.length >0){
+          if(ele.children !== undefined && ele.children.length >0){
               if(ele.firstCheckAll === 'undefined'){
                   this.$set(ele, "firstCheckAll", true);
               }
@@ -362,7 +372,7 @@ export default {
       }else{
           // 取消全部选择
           this.dataList.forEach((ele) => {
-          if(ele.second !== undefined && ele.second.length >0){
+          if(ele.children !== undefined && ele.children.length >0){
               if(ele.firstCheckAll === 'undefined'){
                   this.$set(ele, "firstCheckAll", true);
               }
@@ -371,7 +381,6 @@ export default {
           }
         })
       }
-      
     }
   }
 };
